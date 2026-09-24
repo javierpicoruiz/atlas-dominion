@@ -1,0 +1,50 @@
+{
+  "City": {
+    "id": "string",
+    "name": "string",
+    "lat": "number",
+    "lon": "number",
+    "class": "town|regional|major|metropolis",
+    "populationM": "number",
+    "ownerId": "string|null",
+    "morale": "0..100",
+    "stability": "0..100",
+    "integrity": "number",
+    "maxIntegrity": "number",
+    "occupationStartedAt": "timestamp|null",
+    "criticalUnrestStartedAt": "timestamp|null",
+    "localStockpile": "ResourceBundle",
+    "buildings": "BuildingInstance[]",
+    "queues": "QueueItem[]",
+    "isPort": "boolean"
+  },
+  "ResourceNode": {
+    "id": "string",
+    "type": "food|iron|oil|energy|rareMaterials",
+    "lat": "number",
+    "lon": "number",
+    "ownerId": "string|null",
+    "level": "1..5",
+    "outputPerHour": "number",
+    "connectedNodeIds": "string[]"
+  },
+  "Army": {
+    "id": "string",
+    "ownerId": "string",
+    "nodeId": "string|null",
+    "units": "UnitStack[]",
+    "order": "ArmyOrder|null",
+    "morale": "0..100",
+    "supplyState": "supplied|strained|unsupplied",
+    "lastSuppliedAt": "timestamp"
+  },
+  "Route": {
+    "id": "string",
+    "a": "nodeId",
+    "b": "nodeId",
+    "type": "road|rail|sea",
+    "distanceKm": "number",
+    "capacity": "number",
+    "terrain": "plains|forest|mountain|desert|urban|sea"
+  }
+}

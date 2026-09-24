@@ -1,0 +1,670 @@
+{
+  "cities": [
+    {
+      "id": "london",
+      "name": "London",
+      "lat": 51.507,
+      "lon": -0.128,
+      "class": "major",
+      "populationM": 9.0,
+      "isPort": true
+    },
+    {
+      "id": "paris",
+      "name": "Paris",
+      "lat": 48.857,
+      "lon": 2.352,
+      "class": "major",
+      "populationM": 11.0,
+      "isPort": false
+    },
+    {
+      "id": "madrid",
+      "name": "Madrid",
+      "lat": 40.417,
+      "lon": -3.704,
+      "class": "major",
+      "populationM": 6.8,
+      "isPort": false
+    },
+    {
+      "id": "lisbon",
+      "name": "Lisbon",
+      "lat": 38.722,
+      "lon": -9.139,
+      "class": "regional",
+      "populationM": 2.9,
+      "isPort": true
+    },
+    {
+      "id": "rome",
+      "name": "Rome",
+      "lat": 41.903,
+      "lon": 12.496,
+      "class": "major",
+      "populationM": 4.3,
+      "isPort": true
+    },
+    {
+      "id": "berlin",
+      "name": "Berlin",
+      "lat": 52.52,
+      "lon": 13.405,
+      "class": "major",
+      "populationM": 4.8,
+      "isPort": false
+    },
+    {
+      "id": "warsaw",
+      "name": "Warsaw",
+      "lat": 52.229,
+      "lon": 21.012,
+      "class": "regional",
+      "populationM": 3.1,
+      "isPort": false
+    },
+    {
+      "id": "vienna",
+      "name": "Vienna",
+      "lat": 48.208,
+      "lon": 16.374,
+      "class": "regional",
+      "populationM": 2.9,
+      "isPort": false
+    },
+    {
+      "id": "athens",
+      "name": "Athens",
+      "lat": 37.984,
+      "lon": 23.728,
+      "class": "regional",
+      "populationM": 3.1,
+      "isPort": true
+    },
+    {
+      "id": "istanbul",
+      "name": "Istanbul",
+      "lat": 41.008,
+      "lon": 28.978,
+      "class": "metropolis",
+      "populationM": 15.0,
+      "isPort": true
+    },
+    {
+      "id": "kyiv",
+      "name": "Kyiv",
+      "lat": 50.45,
+      "lon": 30.523,
+      "class": "major",
+      "populationM": 3.0,
+      "isPort": false
+    },
+    {
+      "id": "moscow",
+      "name": "Moscow",
+      "lat": 55.755,
+      "lon": 37.617,
+      "class": "metropolis",
+      "populationM": 13.0,
+      "isPort": false
+    },
+    {
+      "id": "st_petersburg",
+      "name": "Saint Petersburg",
+      "lat": 59.934,
+      "lon": 30.335,
+      "class": "major",
+      "populationM": 5.6,
+      "isPort": true
+    },
+    {
+      "id": "stockholm",
+      "name": "Stockholm",
+      "lat": 59.329,
+      "lon": 18.069,
+      "class": "regional",
+      "populationM": 2.4,
+      "isPort": true
+    },
+    {
+      "id": "oslo",
+      "name": "Oslo",
+      "lat": 59.914,
+      "lon": 10.752,
+      "class": "regional",
+      "populationM": 1.1,
+      "isPort": true
+    },
+    {
+      "id": "cairo",
+      "name": "Cairo",
+      "lat": 30.044,
+      "lon": 31.236,
+      "class": "metropolis",
+      "populationM": 20.0,
+      "isPort": false
+    },
+    {
+      "id": "casablanca",
+      "name": "Casablanca",
+      "lat": 33.573,
+      "lon": -7.59,
+      "class": "major",
+      "populationM": 4.0,
+      "isPort": true
+    },
+    {
+      "id": "algiers",
+      "name": "Algiers",
+      "lat": 36.753,
+      "lon": 3.058,
+      "class": "major",
+      "populationM": 3.5,
+      "isPort": true
+    },
+    {
+      "id": "lagos",
+      "name": "Lagos",
+      "lat": 6.524,
+      "lon": 3.379,
+      "class": "metropolis",
+      "populationM": 15.0,
+      "isPort": true
+    },
+    {
+      "id": "accra",
+      "name": "Accra",
+      "lat": 5.603,
+      "lon": -0.187,
+      "class": "regional",
+      "populationM": 2.5,
+      "isPort": true
+    },
+    {
+      "id": "addis_ababa",
+      "name": "Addis Ababa",
+      "lat": 8.98,
+      "lon": 38.757,
+      "class": "major",
+      "populationM": 5.5,
+      "isPort": false
+    },
+    {
+      "id": "nairobi",
+      "name": "Nairobi",
+      "lat": -1.286,
+      "lon": 36.817,
+      "class": "major",
+      "populationM": 5.0,
+      "isPort": false
+    },
+    {
+      "id": "kinshasa",
+      "name": "Kinshasa",
+      "lat": -4.322,
+      "lon": 15.307,
+      "class": "metropolis",
+      "populationM": 15.0,
+      "isPort": false
+    },
+    {
+      "id": "johannesburg",
+      "name": "Johannesburg",
+      "lat": -26.204,
+      "lon": 28.047,
+      "class": "major",
+      "populationM": 6.0,
+      "isPort": false
+    },
+    {
+      "id": "cape_town",
+      "name": "Cape Town",
+      "lat": -33.925,
+      "lon": 18.424,
+      "class": "major",
+      "populationM": 4.8,
+      "isPort": true
+    },
+    {
+      "id": "riyadh",
+      "name": "Riyadh",
+      "lat": 24.714,
+      "lon": 46.675,
+      "class": "major",
+      "populationM": 7.6,
+      "isPort": false
+    },
+    {
+      "id": "dubai",
+      "name": "Dubai",
+      "lat": 25.204,
+      "lon": 55.271,
+      "class": "major",
+      "populationM": 3.6,
+      "isPort": true
+    },
+    {
+      "id": "tehran",
+      "name": "Tehran",
+      "lat": 35.689,
+      "lon": 51.389,
+      "class": "metropolis",
+      "populationM": 9.5,
+      "isPort": false
+    },
+    {
+      "id": "baghdad",
+      "name": "Baghdad",
+      "lat": 33.315,
+      "lon": 44.366,
+      "class": "major",
+      "populationM": 7.5,
+      "isPort": false
+    },
+    {
+      "id": "karachi",
+      "name": "Karachi",
+      "lat": 24.861,
+      "lon": 67.01,
+      "class": "metropolis",
+      "populationM": 16.0,
+      "isPort": true
+    },
+    {
+      "id": "delhi",
+      "name": "Delhi",
+      "lat": 28.614,
+      "lon": 77.209,
+      "class": "metropolis",
+      "populationM": 30.0,
+      "isPort": false
+    },
+    {
+      "id": "mumbai",
+      "name": "Mumbai",
+      "lat": 19.076,
+      "lon": 72.878,
+      "class": "metropolis",
+      "populationM": 20.0,
+      "isPort": true
+    },
+    {
+      "id": "kolkata",
+      "name": "Kolkata",
+      "lat": 22.573,
+      "lon": 88.364,
+      "class": "metropolis",
+      "populationM": 14.0,
+      "isPort": true
+    },
+    {
+      "id": "dhaka",
+      "name": "Dhaka",
+      "lat": 23.81,
+      "lon": 90.412,
+      "class": "metropolis",
+      "populationM": 20.0,
+      "isPort": false
+    },
+    {
+      "id": "bangkok",
+      "name": "Bangkok",
+      "lat": 13.756,
+      "lon": 100.502,
+      "class": "metropolis",
+      "populationM": 10.5,
+      "isPort": true
+    },
+    {
+      "id": "singapore",
+      "name": "Singapore",
+      "lat": 1.352,
+      "lon": 103.82,
+      "class": "major",
+      "populationM": 5.9,
+      "isPort": true
+    },
+    {
+      "id": "jakarta",
+      "name": "Jakarta",
+      "lat": -6.209,
+      "lon": 106.846,
+      "class": "metropolis",
+      "populationM": 11.0,
+      "isPort": true
+    },
+    {
+      "id": "manila",
+      "name": "Manila",
+      "lat": 14.6,
+      "lon": 120.984,
+      "class": "metropolis",
+      "populationM": 14.0,
+      "isPort": true
+    },
+    {
+      "id": "hanoi",
+      "name": "Hanoi",
+      "lat": 21.028,
+      "lon": 105.834,
+      "class": "major",
+      "populationM": 8.0,
+      "isPort": false
+    },
+    {
+      "id": "ho_chi_minh",
+      "name": "Ho Chi Minh City",
+      "lat": 10.823,
+      "lon": 106.63,
+      "class": "metropolis",
+      "populationM": 9.0,
+      "isPort": true
+    },
+    {
+      "id": "beijing",
+      "name": "Beijing",
+      "lat": 39.904,
+      "lon": 116.407,
+      "class": "metropolis",
+      "populationM": 21.0,
+      "isPort": false
+    },
+    {
+      "id": "shanghai",
+      "name": "Shanghai",
+      "lat": 31.23,
+      "lon": 121.474,
+      "class": "metropolis",
+      "populationM": 25.0,
+      "isPort": true
+    },
+    {
+      "id": "guangzhou",
+      "name": "Guangzhou",
+      "lat": 23.129,
+      "lon": 113.264,
+      "class": "metropolis",
+      "populationM": 18.0,
+      "isPort": true
+    },
+    {
+      "id": "hong_kong",
+      "name": "Hong Kong",
+      "lat": 22.319,
+      "lon": 114.169,
+      "class": "major",
+      "populationM": 7.5,
+      "isPort": true
+    },
+    {
+      "id": "seoul",
+      "name": "Seoul",
+      "lat": 37.566,
+      "lon": 126.978,
+      "class": "metropolis",
+      "populationM": 9.5,
+      "isPort": true
+    },
+    {
+      "id": "tokyo",
+      "name": "Tokyo",
+      "lat": 35.676,
+      "lon": 139.65,
+      "class": "metropolis",
+      "populationM": 14.0,
+      "isPort": true
+    },
+    {
+      "id": "osaka",
+      "name": "Osaka",
+      "lat": 34.694,
+      "lon": 135.502,
+      "class": "major",
+      "populationM": 9.0,
+      "isPort": true
+    },
+    {
+      "id": "sydney",
+      "name": "Sydney",
+      "lat": -33.869,
+      "lon": 151.209,
+      "class": "major",
+      "populationM": 5.3,
+      "isPort": true
+    },
+    {
+      "id": "melbourne",
+      "name": "Melbourne",
+      "lat": -37.814,
+      "lon": 144.963,
+      "class": "major",
+      "populationM": 5.2,
+      "isPort": true
+    },
+    {
+      "id": "perth",
+      "name": "Perth",
+      "lat": -31.952,
+      "lon": 115.861,
+      "class": "regional",
+      "populationM": 2.2,
+      "isPort": true
+    },
+    {
+      "id": "auckland",
+      "name": "Auckland",
+      "lat": -36.851,
+      "lon": 174.764,
+      "class": "regional",
+      "populationM": 1.7,
+      "isPort": true
+    },
+    {
+      "id": "new_york",
+      "name": "New York",
+      "lat": 40.713,
+      "lon": -74.006,
+      "class": "metropolis",
+      "populationM": 19.0,
+      "isPort": true
+    },
+    {
+      "id": "boston",
+      "name": "Boston",
+      "lat": 42.36,
+      "lon": -71.059,
+      "class": "regional",
+      "populationM": 4.9,
+      "isPort": true
+    },
+    {
+      "id": "washington_dc",
+      "name": "Washington DC",
+      "lat": 38.907,
+      "lon": -77.037,
+      "class": "major",
+      "populationM": 6.3,
+      "isPort": false
+    },
+    {
+      "id": "chicago",
+      "name": "Chicago",
+      "lat": 41.878,
+      "lon": -87.63,
+      "class": "major",
+      "populationM": 9.0,
+      "isPort": false
+    },
+    {
+      "id": "houston",
+      "name": "Houston",
+      "lat": 29.76,
+      "lon": -95.37,
+      "class": "major",
+      "populationM": 7.2,
+      "isPort": true
+    },
+    {
+      "id": "miami",
+      "name": "Miami",
+      "lat": 25.762,
+      "lon": -80.192,
+      "class": "major",
+      "populationM": 6.2,
+      "isPort": true
+    },
+    {
+      "id": "los_angeles",
+      "name": "Los Angeles",
+      "lat": 34.052,
+      "lon": -118.244,
+      "class": "metropolis",
+      "populationM": 13.0,
+      "isPort": true
+    },
+    {
+      "id": "san_francisco",
+      "name": "San Francisco",
+      "lat": 37.775,
+      "lon": -122.419,
+      "class": "major",
+      "populationM": 4.6,
+      "isPort": true
+    },
+    {
+      "id": "seattle",
+      "name": "Seattle",
+      "lat": 47.606,
+      "lon": -122.332,
+      "class": "major",
+      "populationM": 4.0,
+      "isPort": true
+    },
+    {
+      "id": "mexico_city",
+      "name": "Mexico City",
+      "lat": 19.433,
+      "lon": -99.133,
+      "class": "metropolis",
+      "populationM": 22.0,
+      "isPort": false
+    },
+    {
+      "id": "monterrey",
+      "name": "Monterrey",
+      "lat": 25.687,
+      "lon": -100.316,
+      "class": "major",
+      "populationM": 5.3,
+      "isPort": false
+    },
+    {
+      "id": "havana",
+      "name": "Havana",
+      "lat": 23.113,
+      "lon": -82.367,
+      "class": "regional",
+      "populationM": 2.1,
+      "isPort": true
+    },
+    {
+      "id": "panama_city",
+      "name": "Panama City",
+      "lat": 8.982,
+      "lon": -79.52,
+      "class": "regional",
+      "populationM": 1.9,
+      "isPort": true
+    },
+    {
+      "id": "bogota",
+      "name": "Bogotá",
+      "lat": 4.711,
+      "lon": -74.072,
+      "class": "metropolis",
+      "populationM": 11.0,
+      "isPort": false
+    },
+    {
+      "id": "caracas",
+      "name": "Caracas",
+      "lat": 10.48,
+      "lon": -66.903,
+      "class": "major",
+      "populationM": 3.0,
+      "isPort": true
+    },
+    {
+      "id": "lima",
+      "name": "Lima",
+      "lat": -12.046,
+      "lon": -77.043,
+      "class": "metropolis",
+      "populationM": 11.0,
+      "isPort": true
+    },
+    {
+      "id": "santiago",
+      "name": "Santiago",
+      "lat": -33.449,
+      "lon": -70.669,
+      "class": "metropolis",
+      "populationM": 7.0,
+      "isPort": false
+    },
+    {
+      "id": "buenos_aires",
+      "name": "Buenos Aires",
+      "lat": -34.604,
+      "lon": -58.382,
+      "class": "metropolis",
+      "populationM": 15.0,
+      "isPort": true
+    },
+    {
+      "id": "sao_paulo",
+      "name": "São Paulo",
+      "lat": -23.55,
+      "lon": -46.633,
+      "class": "metropolis",
+      "populationM": 22.0,
+      "isPort": false
+    },
+    {
+      "id": "rio",
+      "name": "Rio de Janeiro",
+      "lat": -22.907,
+      "lon": -43.173,
+      "class": "metropolis",
+      "populationM": 13.0,
+      "isPort": true
+    },
+    {
+      "id": "brasilia",
+      "name": "Brasília",
+      "lat": -15.794,
+      "lon": -47.883,
+      "class": "major",
+      "populationM": 4.8,
+      "isPort": false
+    },
+    {
+      "id": "recife",
+      "name": "Recife",
+      "lat": -8.047,
+      "lon": -34.877,
+      "class": "major",
+      "populationM": 4.0,
+      "isPort": true
+    },
+    {
+      "id": "manaus",
+      "name": "Manaus",
+      "lat": -3.119,
+      "lon": -60.022,
+      "class": "major",
+      "populationM": 2.3,
+      "isPort": true
+    }
+  ]
+}
