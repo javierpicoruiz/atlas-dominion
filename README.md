@@ -89,7 +89,11 @@ The MapLibre worker is bundled explicitly using Vite's `?worker&url` integration
 
 The mobile home-screen icon is a soldier holding a cucumber. Apple uses the 180px touch icon; the manifest provides 192px and 512px icons plus a padded maskable version. The source artwork and generation prompt are in `assets/branding/`.
 
-`vite.config.ts` uses a relative base, manifest scope and start URL. Deploy `dist/` under a static HTTPS host or GitHub Pages repository path. Build output and `node_modules` are ignored by Git; no deployment is performed by the build.
+`vite.config.ts` uses `/atlas-dominion/` for the Vite base, PWA scope, manifest start URL and offline navigation fallback. The public game URL is https://javierpicoruiz.github.io/atlas-dominion/. Local dev and preview URLs also include `/atlas-dominion/`.
+
+In the repository's **Settings → Pages → Build and deployment**, select **GitHub Actions** as the source. `.github/workflows/deploy.yml` runs on every push to `main` and can also be started manually from the Actions tab. It installs dependencies with `npm ci`, runs tests, builds the application and publishes only `dist/` using the official GitHub Pages Actions. The `github-pages` environment exposes the deployed URL once deployment succeeds.
+
+Build output and `node_modules` are ignored by Git; running the local build does not publish the game.
 
 ## Validation and remaining scope
 

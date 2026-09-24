@@ -2,12 +2,15 @@ import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
+const base = "/atlas-dominion/";
+
 export default defineConfig({
-  base: "./",
+  base,
   plugins: [
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      scope: base,
       includeAssets: ["icons/*.png", "icons/*.svg", "maps/*.geojson"],
       manifest: {
         name: "Atlas Dominion",
@@ -16,8 +19,8 @@ export default defineConfig({
         theme_color: "#132b2c",
         background_color: "#102021",
         display: "standalone",
-        start_url: "./",
-        scope: "./",
+        start_url: base,
+        scope: base,
         icons: [
           {
             src: "icons/soldier-cucumber-192.png",
@@ -41,7 +44,7 @@ export default defineConfig({
       workbox: {
         importScripts: ["notification-handler.js"],
         globPatterns: ["**/*.{js,css,html,png,svg,woff2,geojson}"],
-        navigateFallback: "index.html",
+        navigateFallback: `${base}index.html`,
       },
     }),
   ],
