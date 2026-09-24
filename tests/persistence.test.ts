@@ -64,7 +64,7 @@ it("rejects future versions and corrupt saves without overwriting them", async (
   await expect(db.load()).rejects.toThrow("Unsupported save schema");
   expect((await db.campaigns.get("latest"))?.state.schemaVersion).toBe(99);
   await db.campaigns.update("latest", {
-    "state.schemaVersion": 2,
+    "state.schemaVersion": 3,
     "state.cities": [],
   });
   await expect(db.load()).rejects.toThrow("invalid");
@@ -111,14 +111,17 @@ describe("application orchestration", () => {
     expect(store.getState().status).toBe("ready");
     await store
       .getState()
-      .dispatch({ kind: "recruit", cityId: "haven", unit: "infantry" });
+      .dispatch({ kind: "recruit", cityId: "madrid", unit: "infantry" });
     expect((await db.load())?.state).toEqual(store.getState().game);
     now += 2 * HOUR;
     const reopened = createGameStore(db, { now: () => now });
     await reopened.getState().initialize();
     expect(reopened.getState().resumedMs).toBe(2 * HOUR);
     expect(reopened.getState().game?.armies[0].units[0].count).toBe(4);
-    expect(reopened.getState().game?.cities[0].queues).toHaveLength(0);
+    expect(
+      reopened.getState().game?.cities.find((city) => city.id === "madrid")
+        ?.queues,
+    ).toHaveLength(0);
   });
   it("does not reset a campaign after read failure", async () => {
     const save = vi.fn();
@@ -152,13 +155,13 @@ describe("application orchestration", () => {
     fail = true;
     await store
       .getState()
-      .dispatch({ kind: "recruit", cityId: "haven", unit: "infantry" });
+      .dispatch({ kind: "recruit", cityId: "madrid", unit: "infantry" });
     expect(store.getState().game).toEqual(before);
     expect(store.getState().error).toContain("Quota exceeded");
     fail = false;
     await store
       .getState()
-      .dispatch({ kind: "recruit", cityId: "haven", unit: "infantry" });
+      .dispatch({ kind: "recruit", cityId: "madrid", unit: "infantry" });
     expect(store.getState().game?.factions[0].resources.money).toBe(
       before!.factions[0].resources.money - UNITS.infantry.cost.money,
     );
@@ -172,7 +175,7 @@ describe("application orchestration", () => {
     await second.getState().initialize();
     await first
       .getState()
-      .dispatch({ kind: "recruit", cityId: "haven", unit: "infantry" });
+      .dispatch({ kind: "recruit", cityId: "madrid", unit: "infantry" });
     expect(first.getState().status).toBe("error");
     expect(first.getState().error).toContain("another tab");
     now -= HOUR;
@@ -186,11 +189,14 @@ describe("application orchestration", () => {
     await Promise.all([
       store
         .getState()
-        .dispatch({ kind: "recruit", cityId: "haven", unit: "infantry" }),
+        .dispatch({ kind: "recruit", cityId: "madrid", unit: "infantry" }),
       store
         .getState()
-        .dispatch({ kind: "recruit", cityId: "haven", unit: "infantry" }),
+        .dispatch({ kind: "recruit", cityId: "madrid", unit: "infantry" }),
     ]);
-    expect(store.getState().game?.cities[0].queues).toHaveLength(1);
+    expect(
+      store.getState().game?.cities.find((city) => city.id === "madrid")
+        ?.queues,
+    ).toHaveLength(1);
   });
 });

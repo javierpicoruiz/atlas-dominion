@@ -1,3 +1,4 @@
+import { distanceKm, pathDistanceKm, routePath } from "../simulation/geography";
 import type { GameState, Location } from "../types/game";
 export function campaignGeoJSON(state: GameState) {
   return {
@@ -31,10 +32,10 @@ export function campaignGeoJSON(state: GameState) {
         properties: { kind: "route", distanceKm: route.distanceKm },
         geometry: {
           type: "LineString" as const,
-          coordinates: [route.a, route.b].map((id) => {
-            const city = state.cities.find((city) => city.id === id)!;
-            return [city.lon, city.lat];
-          }),
+          coordinates: routePath(state, route).map((point) => [
+            point.lon,
+            point.lat,
+          ]),
         },
       })),
     ],
@@ -56,10 +57,22 @@ export function armyVisualPosition(
     0,
     Math.min(1, (at - order.departedAt) / (order.arrivesAt - order.departedAt)),
   );
-  return {
-    lon: from.lon + (to.lon - from.lon) * progress,
-    lat: from.lat + (to.lat - from.lat) * progress,
-  };
+  const route = state.routes.find((entry) => entry.id === order.routeId);
+  const path = route ? routePath(state, route) : [from, to];
+  if (route && route.a !== order.fromId) path.reverse();
+  let remaining = progress * pathDistanceKm(path);
+  for (let i = 1; i < path.length; i++) {
+    const length = distanceKm(path[i - 1], path[i]);
+    if (remaining <= length && length > 0) {
+      const fraction = remaining / length;
+      return {
+        lon: path[i - 1].lon + (path[i].lon - path[i - 1].lon) * fraction,
+        lat: path[i - 1].lat + (path[i].lat - path[i - 1].lat) * fraction,
+      };
+    }
+    remaining -= length;
+  }
+  return { lat: to.lat, lon: to.lon };
 }
 export function armyRouteGeoJSON(state: GameState) {
   return {
@@ -75,6 +88,12 @@ export function armyRouteGeoJSON(state: GameState) {
         (city) =>
           city.id === (order.kind === "move" ? order.toId : order.targetCityId),
       )!;
+      const route =
+        order.kind === "move"
+          ? state.routes.find((entry) => entry.id === order.routeId)
+          : undefined;
+      const path = route ? routePath(state, route) : [from, to];
+      if (route && route.a !== from.id) path.reverse();
       return [
         {
           type: "Feature" as const,
@@ -86,10 +105,7 @@ export function armyRouteGeoJSON(state: GameState) {
           },
           geometry: {
             type: "LineString" as const,
-            coordinates: [
-              [from.lon, from.lat],
-              [to.lon, to.lat],
-            ],
+            coordinates: path.map((point) => [point.lon, point.lat]),
           },
         },
       ];

@@ -10,15 +10,20 @@ test("mobile campaign supports recruitment, construction, movement and reload", 
     page.getByRole("heading", { name: "A foothold in the world." }),
   ).toBeVisible();
   await expect(page.getByLabel("Treasury")).toBeVisible();
-  await expect(page.getByTestId("geographic-map")).toHaveAttribute("data-ready", "true");
+  await expect(page.getByTestId("geographic-map")).toHaveAttribute(
+    "data-ready",
+    "true",
+  );
   await page.screenshot({ path: "test-results/mobile-world.png" });
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  await page.locator(".map-city-picker summary").click();
   await page
-    .getByRole("button", { name: /^Haven, The Meridian Union/ })
+    .locator(".map-city-picker")
+    .getByRole("button", { name: "Madrid", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page
@@ -35,14 +40,16 @@ test("mobile campaign supports recruitment, construction, movement and reload", 
   await expect(page.getByLabel("City queues")).toContainText("2 queued");
   await page.getByRole("button", { name: "Close city details" }).click();
   await page.getByRole("button", { name: "Forces", exact: true }).click();
-  await page.getByRole("button", { name: /Move to Ashford/ }).click();
+  await page.getByRole("button", { name: /Move to Gijón/ }).click();
   await page
     .getByRole("button", { name: "Confirm order", exact: true })
     .click();
   await expect(page.getByText("Marching", { exact: true })).toBeVisible();
   await page.reload();
+  await page.locator(".map-city-picker summary").click();
   await page
-    .getByRole("button", { name: /^Haven, The Meridian Union/ })
+    .locator(".map-city-picker")
+    .getByRole("button", { name: "Madrid", exact: true })
     .click();
   await expect(page.getByLabel("City queues")).toContainText("2 queued");
   await page.getByRole("button", { name: "Close city details" }).click();
@@ -70,8 +77,10 @@ test("production PWA loads and restores a save offline", async ({
         ),
       );
   });
+  await page.locator(".map-city-picker summary").click();
   await page
-    .getByRole("button", { name: /^Haven, The Meridian Union/ })
+    .locator(".map-city-picker")
+    .getByRole("button", { name: "Madrid", exact: true })
     .click();
   await page
     .getByRole("button", { name: "Recruit units", exact: true })
@@ -85,8 +94,10 @@ test("production PWA loads and restores a save offline", async ({
   await expect(
     page.getByRole("heading", { name: "A foothold in the world." }),
   ).toBeVisible();
+  await page.locator(".map-city-picker summary").click();
   await page
-    .getByRole("button", { name: /^Haven, The Meridian Union/ })
+    .locator(".map-city-picker")
+    .getByRole("button", { name: "Madrid", exact: true })
     .click();
   await expect(page.getByLabel("City queues")).toContainText("1 queued");
 });
@@ -102,8 +113,10 @@ test("all navigation panels fit a narrow phone", async ({ page }) => {
       ),
     ).toBe(true);
   }
+  await page.locator(".map-city-picker summary").click();
   await page
-    .getByRole("button", { name: /^Haven, The Meridian Union/ })
+    .locator(".map-city-picker")
+    .getByRole("button", { name: "Madrid", exact: true })
     .click();
   expect(
     await page

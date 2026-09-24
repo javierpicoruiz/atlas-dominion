@@ -1,7 +1,7 @@
 # Atlas Dominion — Codex project instructions
 
 ## Mission
-Build Atlas Dominion: a mobile-first persistent real-time grand-strategy game on a world map. A normal campaign lasts approximately seven real days.
+Build Atlas Dominion: a mobile-first persistent real-time grand-strategy game on a world map. Campaigns are open-ended with no time limit. Action durations remain real-time.
 
 The core strategic pillars are:
 1. territorial expansion
@@ -76,8 +76,8 @@ Avoid magic numbers in simulation functions.
 ## MVP scope
 Do not build the entire world immediately.
 
-First build a miniature playable simulation containing:
-- 6 cities
+The validated miniature remains a test fixture. The current playable campaign contains:
+- 16 real European cities (see src/data/europeCities.json)
 - player plus simple AI factions
 - Money
 - Food

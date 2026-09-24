@@ -71,6 +71,8 @@ export interface Route {
   b: string;
   type: "road";
   distanceKm: number;
+  waypoints?: Location[];
+  label?: string;
   terrain: "plains" | "forest" | "mountain";
 }
 export type ArmyOrder =
@@ -105,6 +107,8 @@ export interface GameEvent {
   message: string;
   kind:
     | "order"
+    | "recruitment"
+    | "construction"
     | "arrival"
     | "battle-start"
     | "battle-end"
@@ -113,9 +117,10 @@ export interface GameEvent {
     | "unrest"
     | "rebellion";
   cityId: string | null;
+  factionIds?: string[];
 }
 export interface GameState {
-  schemaVersion: 2;
+  schemaVersion: 3;
   battles: { cityId: string; startedAt: Timestamp; nextRoundAt: Timestamp }[];
   seed: number;
   rngState: number;

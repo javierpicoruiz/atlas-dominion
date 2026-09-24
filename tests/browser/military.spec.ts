@@ -38,7 +38,7 @@ test("geographic map supports touch pan, pinch zoom, fit and army selection", as
   page,
   context,
 }) => {
-  await page.goto("/");
+  await installCampaign(page, createTestCampaign(1234, Date.now()));
   await expect(page.getByTestId("geographic-map")).toHaveAttribute(
     "data-ready",
     "true",
@@ -163,7 +163,9 @@ test("artillery UI persists bombardment and damages a city while away", async ({
     .getByRole("button", { name: "Bombard Eastwatch", exact: true })
     .click();
   await page.getByRole("button", { name: "Confirm order" }).click();
-  await expect(page.getByRole("dialog").getByText("Bombarding", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("dialog").getByText("Bombarding", { exact: true }),
+  ).toBeVisible();
   await page.clock.setSystemTime(now + 30 * MINUTE);
   await page.reload();
   await expect(

@@ -1,0 +1,130 @@
+[
+  {
+    "id": "gijon",
+    "name": "Gijón",
+    "geonamesId": 3121424,
+    "lat": 43.53573,
+    "lon": -5.66152,
+    "country": "ES"
+  },
+  {
+    "id": "barcelona",
+    "name": "Barcelona",
+    "geonamesId": 3128760,
+    "lat": 41.38879,
+    "lon": 2.15899,
+    "country": "ES"
+  },
+  {
+    "id": "madrid",
+    "name": "Madrid",
+    "geonamesId": 3117735,
+    "lat": 40.4165,
+    "lon": -3.70256,
+    "country": "ES"
+  },
+  {
+    "id": "paris",
+    "name": "Paris",
+    "geonamesId": 2988507,
+    "lat": 48.85341,
+    "lon": 2.3488,
+    "country": "FR"
+  },
+  {
+    "id": "marseille",
+    "name": "Marseille",
+    "geonamesId": 2995469,
+    "lat": 43.29695,
+    "lon": 5.38107,
+    "country": "FR"
+  },
+  {
+    "id": "roma",
+    "name": "Roma",
+    "geonamesId": 3169070,
+    "lat": 41.89193,
+    "lon": 12.51133,
+    "country": "IT"
+  },
+  {
+    "id": "milano",
+    "name": "Milano",
+    "geonamesId": 3173435,
+    "lat": 45.46427,
+    "lon": 9.18951,
+    "country": "IT"
+  },
+  {
+    "id": "berlin",
+    "name": "Berlin",
+    "geonamesId": 2950159,
+    "lat": 52.52437,
+    "lon": 13.41053,
+    "country": "DE"
+  },
+  {
+    "id": "koln",
+    "name": "Köln",
+    "geonamesId": 2886242,
+    "lat": 50.93333,
+    "lon": 6.95,
+    "country": "DE"
+  },
+  {
+    "id": "amsterdam",
+    "name": "Amsterdam",
+    "geonamesId": 2759794,
+    "lat": 52.37403,
+    "lon": 4.88969,
+    "country": "NL"
+  },
+  {
+    "id": "maastricht",
+    "name": "Maastricht",
+    "geonamesId": 2751283,
+    "lat": 50.84833,
+    "lon": 5.68889,
+    "country": "NL"
+  },
+  {
+    "id": "brussels",
+    "name": "Brussels",
+    "geonamesId": 2800866,
+    "lat": 50.85045,
+    "lon": 4.34878,
+    "country": "BE"
+  },
+  {
+    "id": "copenhagen",
+    "name": "Copenhagen",
+    "geonamesId": 2618425,
+    "lat": 55.67594,
+    "lon": 12.56553,
+    "country": "DK"
+  },
+  {
+    "id": "london",
+    "name": "London",
+    "geonamesId": 2643743,
+    "lat": 51.50853,
+    "lon": -0.12574,
+    "country": "GB"
+  },
+  {
+    "id": "birmingham",
+    "name": "Birmingham",
+    "geonamesId": 2655603,
+    "lat": 52.48142,
+    "lon": -1.89983,
+    "country": "GB"
+  },
+  {
+    "id": "manchester",
+    "name": "Manchester",
+    "geonamesId": 2643123,
+    "lat": 53.48095,
+    "lon": -2.23743,
+    "country": "GB"
+  }
+]

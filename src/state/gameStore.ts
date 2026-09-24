@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { BALANCE } from "../data/balance";
-import { createTestCampaign } from "../data/testCampaign";
-import { advanceGameState } from "../simulation/advanceTime";
+import { createEuropeCampaign } from "../data/europeCampaign";
+import { catchUpGameState } from "./catchUp";
 import { applyCommand } from "../simulation/commands";
 import { resumeTime, systemClock, type Clock } from "../simulation/clock";
 import type { GameCommand, GameState } from "../types/game";
@@ -38,9 +38,8 @@ export function createGameStore(
       set({ busy: true });
       let next: GameState;
       try {
-        next = advanceGameState(
+        next = await catchUpGameState(
           current.game,
-          current.game.lastUpdatedAt,
           resumeTime(current.game, clock),
         );
         if (command) next = applyCommand(next, command);
@@ -75,9 +74,9 @@ export function createGameStore(
         try {
           const loaded = await repository.load();
           const previous =
-            loaded?.state ?? createTestCampaign(BALANCE.seed, clock.now());
+            loaded?.state ?? createEuropeCampaign(BALANCE.seed, clock.now());
           const now = resumeTime(previous, clock);
-          const game = advanceGameState(previous, previous.lastUpdatedAt, now);
+          const game = await catchUpGameState(previous, now);
           const revision = await repository.save(game, loaded?.revision ?? 0);
           set({
             game,

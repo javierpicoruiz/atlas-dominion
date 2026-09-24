@@ -92,7 +92,7 @@ it("supplied cities recover stability and morale stays bounded over a seven-day 
   const state = world();
   state.cities[0].morale = 0;
   state.cities[0].stability = 25;
-  const next = advance(state, BALANCE.campaignHours * HOUR);
+  const next = advance(state, 7 * 24 * HOUR);
   expect(next.cities[0].stability).toBe(100);
   expect(
     next.cities.every((city) => city.morale >= 0 && city.morale <= 100),

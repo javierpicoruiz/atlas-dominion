@@ -144,6 +144,7 @@ export function ArmyCard({ army, game }: { army: Army; game: GameState }) {
                         Move to {city.name}
                         <small>
                           {duration(travelDuration(army, route))}
+                          {route.label ? ` · ${route.label}` : ""}
                           {city.ownerId !== army.ownerId ? " · hostile" : ""}
                         </small>
                       </button>

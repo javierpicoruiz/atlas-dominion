@@ -25,7 +25,10 @@ export function resolveRebellions(state: GameState, at: number): void {
       at < city.criticalSince + BALANCE.rebellion.durationMs
     )
       continue;
-    const rebelId = city.ownerId === `rebels-${city.id}` ? nextId(state, "rebels") : `rebels-${city.id}`;
+    const rebelId =
+      city.ownerId === `rebels-${city.id}`
+        ? nextId(state, "rebels")
+        : `rebels-${city.id}`;
     if (!state.factions.some((faction) => faction.id === rebelId))
       state.factions.push({
         id: rebelId,
@@ -35,6 +38,7 @@ export function resolveRebellions(state: GameState, at: number): void {
         capitalId: city.id,
         resources: bundle(),
       });
+    const previousOwner = city.ownerId;
     transferCity(state, city, rebelId);
     city.occupiedAt = null;
     city.morale = BALANCE.rebellion.morale;
@@ -63,6 +67,7 @@ export function resolveRebellions(state: GameState, at: number): void {
       `Rebellion in ${city.name}! The city declared independence and raised militia.`,
       "rebellion",
       city.id,
+      [previousOwner, rebelId],
     );
   }
 }

@@ -1,6 +1,6 @@
 {
   "campaign": {
-    "durationHours": 168,
+    "durationHours": null,
     "simulationTickSeconds": 60,
     "rebellionThresholdMorale": 20,
     "rebellionGraceMinutes": 45,

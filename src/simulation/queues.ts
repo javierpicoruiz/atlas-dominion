@@ -16,6 +16,8 @@ export function resolveQueues(state: GameState, timestamp: number): void {
           state,
           item.completesAt,
           `${city.name}: ${BUILDINGS[item.building].label} level ${item.level} completed.`,
+          "construction",
+          city.id,
         );
       } else {
         let army = state.armies.find(
@@ -44,6 +46,8 @@ export function resolveQueues(state: GameState, timestamp: number): void {
           state,
           item.completesAt,
           `${city.name}: ${UNITS[item.unit].label} recruited.`,
+          "recruitment",
+          city.id,
         );
       }
     }

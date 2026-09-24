@@ -139,7 +139,7 @@ export function createTestCampaign(
     },
   ];
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     battles: [],
     seed: seed >>> 0,
     rngState: rng.state(),

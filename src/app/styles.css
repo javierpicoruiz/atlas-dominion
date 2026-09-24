@@ -1043,3 +1043,139 @@ nav button[aria-current] {
   font-weight: 400;
   margin-top: 4px;
 }
+
+.brand-row {
+  flex-wrap: wrap;
+}
+.campaign-day {
+  margin-left: auto;
+}
+.notification-bell {
+  position: relative;
+  min-width: 44px;
+  padding: 5px;
+  background: #23453e;
+  color: var(--gold);
+  font-size: 23px;
+}
+.notification-bell span {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 12px;
+  background: #edc689;
+  color: #172d29;
+  font-size: 10px;
+  padding: 2px 4px;
+}
+.notification-help {
+  margin: 12px 0 20px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.notification-list {
+  display: grid;
+  gap: 8px;
+}
+.notification-list button {
+  text-align: left;
+  display: grid;
+  gap: 6px;
+  font-weight: 400;
+}
+.notification-list .unread {
+  border-left: 3px solid var(--gold);
+}
+.notification-list time {
+  color: var(--gold);
+  font-size: 10px;
+}
+.notification-list small {
+  color: var(--accent);
+}
+.map-city-picker {
+  position: absolute;
+  top: 85px;
+  left: 12px;
+  z-index: 4;
+  background: #142b29ed;
+  border: 1px solid #678779;
+  border-radius: 8px;
+  font-size: 12px;
+  max-width: 210px;
+}
+.map-city-picker summary {
+  min-height: 44px;
+  padding: 13px;
+  cursor: pointer;
+}
+.map-city-picker input {
+  margin: 5px 8px;
+  width: calc(100% - 16px);
+  background: #1c3e37;
+  border: 1px solid #678779;
+  color: white;
+  padding: 10px;
+  font: inherit;
+}
+.map-city-picker > div {
+  max-height: 240px;
+  overflow-y: auto;
+  display: grid;
+}
+.map-city-picker button {
+  text-align: left;
+  background: transparent;
+  color: #dfe8d2;
+  font-size: 12px;
+}
+.city-cluster {
+  border-radius: 24px;
+  background: #213f37;
+  color: #e1e5ca;
+  border: 2px solid #afc2a4;
+  font-size: 12px;
+}
+.city-cluster small {
+  display: block;
+  font-size: 9px;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 360px) {
+  .brand-row a {
+    font-size: 10px;
+    letter-spacing: 0.05em;
+  }
+  .campaign-day {
+    font-size: 9px;
+  }
+}
+
+.city-cluster {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 16px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.notification-bell {
+  display: grid;
+  place-items: center;
+}

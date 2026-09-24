@@ -1,7 +1,7 @@
 # ATLAS DOMINION — Game Design Document v0.1
 
 ## 1. High concept
-ATLAS DOMINION is a mobile-first persistent real-time grand-strategy game played on a world map. A normal campaign lasts about seven real days.
+ATLAS DOMINION is a mobile-first persistent real-time grand-strategy game played on a world map. Campaigns are unlimited: there is no automatic ending or reset after seven days. Each action retains its real-time duration.
 
 The player controls cities, resource sites, transport routes, ports, armies and research. Orders continue to resolve while the app is closed. Expansion is constrained by logistics, city morale and economic sustainability rather than only by military strength.
 
@@ -24,11 +24,24 @@ The first implementation should be single-player versus AI and installable as a 
 7. Stabilise newly conquered population.
 8. Research technologies and unlock stronger units.
 9. Adapt to shortages, rebellions, enemy offensives and market prices.
-10. Finish the seven-day campaign with the strongest strategic position.
+10. Continue developing the state indefinitely, with no forced campaign deadline.
 
 The player should be able to make meaningful progress in 5–10 minute sessions, while long actions resolve over tens of minutes or hours.
 
 ---
+
+## Current playable campaign revision
+
+The active campaign contains exactly Gijón, Barcelona, Madrid, Paris, Marseille,
+Roma, Milano, Berlin, Köln, Amsterdam, Maastricht, Brussels, Copenhagen, London,
+Birmingham and Manchester, at real city-centre coordinates. GeoNames attribution
+and source identifiers are recorded in `docs/EUROPE_CAMPAIGN.md`. Travel uses
+geographic corridor lengths and existing unit speeds. The six-city fictional
+campaign remains only as a regression-test fixture.
+
+Notifications include a persistent in-game inbox and opt-in system notifications
+when the app is executing. Closed-app push needs a server and is not part of this
+client-only version. Missed simulation events are collected on resume.
 
 ## 3. World structure
 
@@ -403,7 +416,7 @@ Examples:
 - continental relocation: several hours
 - intercontinental sea movement: 4–12h
 
-This pacing supports a seven-day campaign.
+These are real-time action durations, independent of how long the campaign has been running.
 
 ---
 
@@ -520,7 +533,7 @@ Universities produce RP over time.
 - Public Administration
 - Emergency Relief
 
-A seven-day game should make it impossible to research everything. Technology choice defines strategy.
+Technology choice defines strategy through its resource costs and research time; the campaign itself has no fixed duration.
 
 ---
 
@@ -613,7 +626,7 @@ Events can be accepted/mitigated using money/resources.
 
 ---
 
-## 20. Campaign pacing — 7 real days
+## 20. Progression milestones — illustrative, no campaign deadline
 
 ### Day 1 — Consolidation
 - basic economy
@@ -648,7 +661,7 @@ Events can be accepted/mitigated using money/resources.
 - mature alliances/wars
 - large offensives
 
-### Day 7 — Endgame
+### Later campaign — continued expansion
 - final objectives
 - score pressure
 - unstable overextended empires can collapse
@@ -659,7 +672,7 @@ Research time and costs should naturally create this curve rather than hard-lock
 
 ## 21. Victory
 
-Campaign ends after 168 real hours unless domination is achieved earlier.
+The campaign continues indefinitely. Scores and any future domination milestones must not automatically end or reset play.
 
 Score categories:
 - controlled population;
@@ -799,7 +812,7 @@ Core entities:
 - Event
 
 Important principle:
-Do **not** run a background JavaScript timer continuously to represent seven days.
+Do **not** depend on a background JavaScript timer to advance the campaign while closed.
 
 Instead store:
 - action start time;

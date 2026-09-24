@@ -174,6 +174,7 @@ export function resolveCaptures(state: GameState, at: number): void {
   for (const city of state.cities) {
     if (!city.capture || city.capture.completesAt > at) continue;
     const owner = city.capture.factionId;
+    const previousOwner = city.ownerId;
     transferCity(state, city, owner);
     city.stability = BALANCE.capture.stability;
     city.morale = Math.min(city.morale, BALANCE.capture.morale);
@@ -184,6 +185,7 @@ export function resolveCaptures(state: GameState, at: number): void {
       `${city.name} captured by ${state.factions.find((faction) => faction.id === owner)!.name}. Occupation begins.`,
       "capture",
       city.id,
+      [previousOwner, owner],
     );
   }
 }

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useGameStore } from "../state/gameStore";
 import { useUiStore, type Tab } from "../state/uiStore";
-import { BALANCE, HOUR, RESOURCES } from "../data/balance";
+import { HOUR, RESOURCES } from "../data/balance";
 import { factionRates } from "../simulation/economy";
 import { duration, number, rate, time } from "./format";
 import { WorldMap } from "../map/WorldMap";
 import { ArmySheet } from "../components/ArmySheet";
+import { Notifications } from "../components/Notifications";
 import { CitySheet } from "../components/CitySheet";
 import { CampaignPanels } from "../screens/CampaignPanels";
 
@@ -37,7 +38,7 @@ export default function App() {
       if (document.visibilityState === "visible") void refresh();
     };
     // This only refreshes the visible screen. Simulation always derives elapsed time from saved timestamps.
-    const interval = window.setInterval(resume, 15_000);
+    const interval = window.setInterval(() => void refresh(), 15_000);
     document.addEventListener("visibilitychange", resume);
     window.addEventListener("pageshow", resume);
     window.addEventListener("focus", resume);
@@ -89,8 +90,9 @@ export default function App() {
             ATLAS <span>DOMINION</span>
           </a>
           <span className="campaign-day">
-            DAY {day} <span>/ {BALANCE.campaignHours / 24}</span>
+            DAY {day} <span>· ∞</span>
           </span>
+          <Notifications game={game} />
         </div>
         <div className="resource-bar" aria-label="Treasury">
           {RESOURCES.map((resource) => (

@@ -5,6 +5,7 @@ import {
   RESOURCES,
   UNIT_TYPES,
 } from "../data/balance";
+import { expandLegacyCampaign } from "./migrateEurope";
 import { cityDefaults } from "../simulation/cities";
 import type { GameState } from "../types/game";
 
@@ -37,7 +38,7 @@ const queue = z.discriminatedUnion("kind", [
   }),
 ]);
 const schema: z.ZodType<GameState> = z.object({
-  schemaVersion: z.literal(2),
+  schemaVersion: z.literal(3),
   battles: z.array(
     z.object({ cityId: id, startedAt: timestamp, nextRoundAt: timestamp }),
   ),
@@ -114,6 +115,8 @@ const schema: z.ZodType<GameState> = z.object({
       b: id,
       type: z.literal("road"),
       distanceKm: positive,
+      waypoints: z.array(z.object(coordinates)).optional(),
+      label: id.optional(),
       terrain: z.enum(["plains", "forest", "mountain"]),
     }),
   ),
@@ -160,6 +163,8 @@ const schema: z.ZodType<GameState> = z.object({
       kind: z.enum([
         "order",
         "arrival",
+        "recruitment",
+        "construction",
         "battle-start",
         "battle-end",
         "capture",
@@ -168,6 +173,7 @@ const schema: z.ZodType<GameState> = z.object({
         "rebellion",
       ]),
       cityId: id.nullable(),
+      factionIds: z.array(id).optional(),
     }),
   ),
 });
@@ -209,13 +215,19 @@ export function parseSaveState(value: unknown): GameState {
     typeof value !== "object" ||
     value === null ||
     !("schemaVersion" in value) ||
-    (value.schemaVersion !== 1 && value.schemaVersion !== 2)
+    (value.schemaVersion !== 1 &&
+      value.schemaVersion !== 2 &&
+      value.schemaVersion !== 3)
   )
     throw new Error(
       "Unsupported save schema. Your existing save has been preserved.",
     );
+  const legacy = value.schemaVersion !== 3;
+  const upgraded = value.schemaVersion === 1 ? migrateV1(value) : value;
   const parsed = schema.safeParse(
-    value.schemaVersion === 1 ? migrateV1(value) : value,
+    legacy && upgraded && typeof upgraded === "object"
+      ? { ...upgraded, schemaVersion: 3 }
+      : upgraded,
   );
   if (!parsed.success)
     throw new Error(
@@ -334,5 +346,5 @@ export function parseSaveState(value: unknown): GameState {
       event.at > state.lastUpdatedAt
     )
       fail();
-  return state;
+  return legacy ? parseSaveState(expandLegacyCampaign(state)) : state;
 }

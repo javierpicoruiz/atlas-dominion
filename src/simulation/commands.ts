@@ -52,6 +52,7 @@ export function applyCommand(
         `${city.name} under bombardment from ${army.name}.`,
         "bombardment",
         city.id,
+        [army.ownerId, city.ownerId],
       );
     }
     return next;

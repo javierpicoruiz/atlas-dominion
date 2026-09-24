@@ -5,7 +5,7 @@ Build a mobile-first installable PWA called **Atlas Dominion**.
 Read `docs/GAME_DESIGN.md` before changing architecture.
 
 ## Product goal
-A persistent real-time world strategy game. A normal campaign should last roughly seven real days. The player controls cities, resource nodes, armies, ports, research, morale and logistics. Orders resolve using absolute timestamps while the app is closed.
+A persistent real-time world strategy game. Campaigns continue indefinitely with no time-based ending; orders keep their real-time durations. The player controls cities, resource nodes, armies, ports, research, morale and logistics. Orders resolve using absolute timestamps while the app is closed.
 
 ## Critical constraints
 1. TypeScript.
@@ -18,6 +18,10 @@ A persistent real-time world strategy game. A normal campaign should last roughl
 8. Must deploy cleanly to GitHub Pages.
 9. Do not implement fake timers that require the page to stay open.
 10. Write tests for economy, morale, movement and capture.
+
+## Current scope update
+
+The validated six-city military prototype is now expanded to the 16 real cities in `docs/EUROPE_CAMPAIGN.md`. Preserve the six-city regression fixture and the unused full world seed. Add in-game notifications and opt-in device alerts while executing; no server-backed push in this client-only version.
 
 ## Build in milestones
 

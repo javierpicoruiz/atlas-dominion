@@ -350,7 +350,19 @@ describe("offline military replay and save compatibility", () => {
       delete event.kind;
       delete event.cityId;
     }
-    expect(parseSaveState(legacy)).toEqual(original);
+    const migrated = parseSaveState(legacy);
+    expect(migrated.schemaVersion).toBe(3);
+    expect(migrated.cities).toHaveLength(16);
+    expect(migrated.factions[0].resources).toEqual(
+      original.factions[0].resources,
+    );
+    expect(migrated.armies[0].order).toEqual({
+      ...original.armies[0].order,
+      fromId: "madrid",
+      toId: "gijon",
+      routeId: "madrid-gijon",
+    });
+    expect(migrated.rngState).toBe(original.rngState);
   });
   it("rejects corrupt military state", () => {
     const state = advance(battle(), MINUTE);
