@@ -1,0 +1,220 @@
+import { BALANCE, bundle } from "./balance";
+import type { City, GameState, Route } from "../types/game";
+import { createRng, type RngFactory } from "../simulation/rng";
+import { validateTime } from "../simulation/clock";
+
+/** Geographic data is independent of the placeholder renderer (future MapLibre input). */
+export function createTestCampaign(
+  seed: number,
+  startedAt: number,
+  rngFactory: RngFactory = createRng,
+): GameState {
+  validateTime(startedAt);
+  const rng = rngFactory(seed);
+  const cities: City[] = [
+    {
+      id: "haven",
+      name: "Haven",
+      lat: 49.1,
+      lon: 4.2,
+      ownerId: "player",
+      populationM: 1.4,
+      productionPerHour: bundle(0, 22, 2),
+    },
+    {
+      id: "ashford",
+      name: "Ashford",
+      lat: 50.4,
+      lon: 3.2,
+      ownerId: "player",
+      populationM: 0.8,
+      productionPerHour: bundle(0, 12, 4),
+    },
+    {
+      id: "greenfield",
+      name: "Greenfield",
+      lat: 48.1,
+      lon: 3.4,
+      ownerId: "player",
+      populationM: 0.6,
+      productionPerHour: bundle(0, 18, 1),
+    },
+    {
+      id: "ironridge",
+      name: "Ironridge",
+      lat: 50.6,
+      lon: 6.4,
+      ownerId: "ai",
+      populationM: 1.2,
+      productionPerHour: bundle(0, 16, 6),
+    },
+    {
+      id: "eastwatch",
+      name: "Eastwatch",
+      lat: 49.2,
+      lon: 7.3,
+      ownerId: "ai",
+      populationM: 0.8,
+      productionPerHour: bundle(0, 13, 2, 2),
+    },
+    {
+      id: "sunmere",
+      name: "Sunmere",
+      lat: 47.9,
+      lon: 6.2,
+      ownerId: "ai",
+      populationM: 0.7,
+      productionPerHour: bundle(0, 20, 1),
+    },
+  ].map((city) => ({
+    ...city,
+    development: 1,
+    morale:
+      BALANCE.initialMorale +
+      Math.floor(rng.next() * BALANCE.initialMoraleVariation),
+    stability: BALANCE.initialStability,
+    shortageMinutes: 0,
+    localStockpile: { ...BALANCE.startingLocalStockpile },
+    buildings: [{ type: "barracks", level: 1 }],
+    queues: [],
+  }));
+  const routes: Route[] = [
+    {
+      id: "haven-ashford",
+      a: "haven",
+      b: "ashford",
+      distanceKm: 28,
+      terrain: "plains",
+      type: "road",
+    },
+    {
+      id: "haven-greenfield",
+      a: "haven",
+      b: "greenfield",
+      distanceKm: 21,
+      terrain: "forest",
+      type: "road",
+    },
+    {
+      id: "ashford-ironridge",
+      a: "ashford",
+      b: "ironridge",
+      distanceKm: 65,
+      terrain: "mountain",
+      type: "road",
+    },
+    {
+      id: "haven-eastwatch",
+      a: "haven",
+      b: "eastwatch",
+      distanceKm: 72,
+      terrain: "plains",
+      type: "road",
+    },
+    {
+      id: "greenfield-sunmere",
+      a: "greenfield",
+      b: "sunmere",
+      distanceKm: 49,
+      terrain: "plains",
+      type: "road",
+    },
+    {
+      id: "ironridge-eastwatch",
+      a: "ironridge",
+      b: "eastwatch",
+      distanceKm: 35,
+      terrain: "forest",
+      type: "road",
+    },
+    {
+      id: "eastwatch-sunmere",
+      a: "eastwatch",
+      b: "sunmere",
+      distanceKm: 30,
+      terrain: "plains",
+      type: "road",
+    },
+  ];
+  return {
+    schemaVersion: 1,
+    seed: seed >>> 0,
+    rngState: rng.state(),
+    nextId: 1,
+    startedAt,
+    lastUpdatedAt: startedAt,
+    lastEconomyAt: startedAt,
+    playerFactionId: "player",
+    factions: [
+      {
+        id: "player",
+        name: "The Meridian Union",
+        color: "#79c6af",
+        controller: "player",
+        capitalId: "haven",
+        resources: { ...BALANCE.startingResources },
+      },
+      {
+        id: "ai",
+        name: "Eastern Accord",
+        color: "#dfac79",
+        controller: "ai",
+        capitalId: "ironridge",
+        resources: { ...BALANCE.startingResources },
+      },
+    ],
+    cities,
+    routes,
+    resourceNodes: [
+      {
+        id: "farms",
+        name: "Greenfield farms",
+        cityId: "greenfield",
+        ownerId: "player",
+        lat: 47.8,
+        lon: 3.9,
+        resource: "food",
+        outputPerHour: 10,
+      },
+      {
+        id: "mine",
+        name: "Ridge mine",
+        cityId: "ironridge",
+        ownerId: "ai",
+        lat: 50.8,
+        lon: 6.9,
+        resource: "iron",
+        outputPerHour: 4,
+      },
+      {
+        id: "oilfield",
+        name: "Haven oilfield",
+        cityId: "haven",
+        ownerId: "player",
+        lat: 48.8,
+        lon: 4.8,
+        resource: "oil",
+        outputPerHour: 3,
+      },
+    ],
+    armies: [
+      {
+        id: "vanguard",
+        name: "Meridian Vanguard",
+        ownerId: "player",
+        cityId: "haven",
+        units: [{ type: "infantry", count: BALANCE.initialGarrison }],
+        order: { kind: "hold" },
+      },
+      {
+        id: "eastern-guard",
+        name: "Eastern Guard",
+        ownerId: "ai",
+        cityId: "ironridge",
+        units: [{ type: "infantry", count: BALANCE.initialGarrison }],
+        order: { kind: "hold" },
+      },
+    ],
+    events: [],
+  };
+}
