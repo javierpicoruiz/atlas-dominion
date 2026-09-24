@@ -10,6 +10,7 @@ test("mobile campaign supports recruitment, construction, movement and reload", 
     page.getByRole("heading", { name: "A foothold in the world." }),
   ).toBeVisible();
   await expect(page.getByLabel("Treasury")).toBeVisible();
+  await expect(page.getByTestId("geographic-map")).toHaveAttribute("data-ready", "true");
   await page.screenshot({ path: "test-results/mobile-world.png" });
   expect(
     await page.evaluate(
@@ -35,6 +36,9 @@ test("mobile campaign supports recruitment, construction, movement and reload", 
   await page.getByRole("button", { name: "Close city details" }).click();
   await page.getByRole("button", { name: "Forces", exact: true }).click();
   await page.getByRole("button", { name: /Move to Ashford/ }).click();
+  await page
+    .getByRole("button", { name: "Confirm order", exact: true })
+    .click();
   await expect(page.getByText("Marching", { exact: true })).toBeVisible();
   await page.reload();
   await page

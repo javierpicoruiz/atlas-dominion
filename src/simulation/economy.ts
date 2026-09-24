@@ -1,6 +1,6 @@
 import { BALANCE, HOUR, RESOURCES, UNITS, bundle } from "../data/balance";
 import type { City, GameState, ResourceBundle } from "../types/game";
-import { cityStockpile, suppliedCityIds } from "./logistics";
+import { armySupportCity, cityStockpile, suppliedCityIds } from "./logistics";
 
 export interface EconomicRates {
   production: ResourceBundle;
@@ -26,8 +26,7 @@ export function cityRates(state: GameState, city: City): EconomicRates {
   );
   // Moving troops continue to draw rations and wages from their departure city.
   for (const army of state.armies) {
-    const supportCityId =
-      army.order.kind === "move" ? army.order.fromId : army.cityId;
+    const supportCityId = armySupportCity(state, army)?.id;
     if (army.ownerId !== city.ownerId || supportCityId !== city.id) continue;
     for (const stack of army.units) {
       consumption.money += UNITS[stack.type].upkeepMoneyPerHour * stack.count;

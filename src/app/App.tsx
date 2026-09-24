@@ -5,6 +5,7 @@ import { BALANCE, HOUR, RESOURCES } from "../data/balance";
 import { factionRates } from "../simulation/economy";
 import { duration, number, rate, time } from "./format";
 import { WorldMap } from "../map/WorldMap";
+import { ArmySheet } from "../components/ArmySheet";
 import { CitySheet } from "../components/CitySheet";
 import { CampaignPanels } from "../screens/CampaignPanels";
 
@@ -170,6 +171,7 @@ export default function App() {
         </nav>
       </footer>
       <CitySheet game={game} />
+      <ArmySheet game={game} />
     </div>
   );
 }

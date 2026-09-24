@@ -312,13 +312,7 @@ describe("command validation", () => {
         toId: "haven",
       }),
     ).toThrow("control");
-    expect(() =>
-      applyCommand(state, {
-        kind: "move",
-        armyId: "vanguard",
-        toId: "eastwatch",
-      }),
-    ).toThrow("friendly");
+    expect(applyCommand(state, { kind: "move", armyId: "vanguard", toId: "eastwatch" }).armies[0].order.kind).toBe("move");
     expect(() =>
       applyCommand(state, { kind: "move", armyId: "vanguard", toId: "haven" }),
     ).toThrow("route");

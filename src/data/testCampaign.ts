@@ -1,9 +1,10 @@
 import { BALANCE, bundle } from "./balance";
 import type { City, GameState, Route } from "../types/game";
 import { createRng, type RngFactory } from "../simulation/rng";
+import { cityDefaults } from "../simulation/cities";
 import { validateTime } from "../simulation/clock";
 
-/** Geographic data is independent of the placeholder renderer (future MapLibre input). */
+/** Geographic data is independent of the map renderer. */
 export function createTestCampaign(
   seed: number,
   startedAt: number,
@@ -68,6 +69,7 @@ export function createTestCampaign(
     },
   ].map((city) => ({
     ...city,
+    ...cityDefaults(city.populationM),
     development: 1,
     morale:
       BALANCE.initialMorale +
@@ -137,7 +139,8 @@ export function createTestCampaign(
     },
   ];
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
+    battles: [],
     seed: seed >>> 0,
     rngState: rng.state(),
     nextId: 1,
@@ -205,6 +208,8 @@ export function createTestCampaign(
         cityId: "haven",
         units: [{ type: "infantry", count: BALANCE.initialGarrison }],
         order: { kind: "hold" },
+        morale: BALANCE.initialMorale,
+        damage: 0,
       },
       {
         id: "eastern-guard",
@@ -213,6 +218,8 @@ export function createTestCampaign(
         cityId: "ironridge",
         units: [{ type: "infantry", count: BALANCE.initialGarrison }],
         order: { kind: "hold" },
+        morale: BALANCE.initialMorale,
+        damage: 0,
       },
     ],
     events: [],

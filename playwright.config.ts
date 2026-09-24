@@ -5,6 +5,7 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:4173",
     ...devices["iPhone 13"],
     defaultBrowserType: "chromium",
+    launchOptions: { args: ["--enable-unsafe-swiftshader"] },
   },
   webServer: {
     command: "npm run preview -- --port 4173",

@@ -1,173 +1,357 @@
-import type { CSSProperties } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
+import {
+  Map,
+  Marker,
+  NavigationControl,
+  setWorkerUrl,
+  type GeoJSONSource,
+} from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
+import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import type { GameState } from "../types/game";
+import {
+  armyRouteGeoJSON,
+  armyVisualPosition,
+  campaignGeoJSON,
+} from "./mapData";
 import { useUiStore } from "../state/uiStore";
-import { project } from "./mapData";
+import { armyIsSupplied, suppliedCityIds } from "../simulation/logistics";
+import { cityUnderAttack, unitCount } from "../simulation/combat";
+import { duration, time } from "../app/format";
+import { BALANCE } from "../data/balance";
 
+setWorkerUrl(workerUrl);
+
+function MapMarker({
+  map,
+  lon,
+  lat,
+  offset = 0,
+  offsetX = 0,
+  children,
+}: {
+  map: Map;
+  lon: number;
+  lat: number;
+  offset?: number;
+  offsetX?: number;
+  children: ReactNode;
+}) {
+  const [element] = useState(() => document.createElement("div"));
+  const marker = useRef<Marker | null>(null);
+  useEffect(() => {
+    marker.current = new Marker({ element, offset: [offsetX, offset] })
+      .setLngLat([lon, lat])
+      .addTo(map);
+    return () => {
+      marker.current?.remove();
+    };
+    // Position updates are handled separately to retain focus on live markers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, element, offset, offsetX]);
+  useEffect(() => {
+    marker.current?.setLngLat([lon, lat]);
+  }, [lon, lat]);
+  return createPortal(children, element);
+}
 export function WorldMap({ game }: { game: GameState }) {
-  const selectCity = useUiStore((state) => state.selectCity);
+  const container = useRef<HTMLDivElement>(null);
+  const [map, setMap] = useState<Map | null>(null);
+  const [mapError, setMapError] = useState(false);
+  const [now, setNow] = useState(Date.now());
+  const initial = useRef(game);
+  const { selectCity, selectArmy } = useUiStore();
+  const supplied = suppliedCityIds(game);
+  const fit = (instance: Map) => {
+    const cities = initial.current.cities;
+    instance.fitBounds(
+      [
+        [
+          Math.min(...cities.map((c) => c.lon)),
+          Math.min(...cities.map((c) => c.lat)),
+        ],
+        [
+          Math.max(...cities.map((c) => c.lon)),
+          Math.max(...cities.map((c) => c.lat)),
+        ],
+      ],
+      { padding: { top: 105, bottom: 130, left: 65, right: 65 }, duration: 0 },
+    );
+  };
+  useEffect(() => {
+    if (!container.current) return;
+    let instance: Map;
+    try {
+      instance = new Map({
+        container: container.current,
+        center: [5.2, 49.2],
+        zoom: 5,
+        minZoom: 3,
+        maxZoom: 12,
+        maxBounds: [
+          [-12, 35],
+          [25, 62],
+        ],
+        style: {
+          version: 8,
+          sources: {
+            geography: {
+              type: "geojson",
+              data: `${import.meta.env.BASE_URL}maps/europe.geojson`,
+              attribution:
+                '<a href="https://www.naturalearthdata.com/">Natural Earth</a>',
+            },
+            campaign: {
+              type: "geojson",
+              data: campaignGeoJSON(initial.current),
+            },
+            orders: {
+              type: "geojson",
+              data: armyRouteGeoJSON(initial.current),
+            },
+          },
+          layers: [
+            {
+              id: "sea",
+              type: "background",
+              paint: { "background-color": "#112d39" },
+            },
+            {
+              id: "land",
+              type: "fill",
+              source: "geography",
+              paint: { "fill-color": "#304b40" },
+            },
+            {
+              id: "borders",
+              type: "line",
+              source: "geography",
+              paint: {
+                "line-color": "#8fa88a",
+                "line-width": 1,
+                "line-opacity": 0.5,
+              },
+            },
+            {
+              id: "land-routes",
+              type: "line",
+              source: "campaign",
+              filter: ["==", "kind", "route"],
+              paint: {
+                "line-color": "#c7c698",
+                "line-width": 2,
+                "line-dasharray": [2, 3],
+                "line-opacity": 0.7,
+              },
+            },
+            {
+              id: "army-routes",
+              type: "line",
+              source: "orders",
+              paint: {
+                "line-color": ["get", "color"],
+                "line-width": 3,
+                "line-opacity": 0.85,
+              },
+            },
+            {
+              id: "destinations",
+              type: "circle",
+              source: "campaign",
+              filter: ["==", "kind", "city"],
+              paint: {
+                "circle-radius": 18,
+                "circle-color": "#aaca99",
+                "circle-opacity": 0.1,
+              },
+            },
+          ],
+        },
+      });
+    } catch {
+      setMapError(true);
+      return;
+    }
+    instance.addControl(
+      new NavigationControl({ showCompass: false }),
+      "top-right",
+    );
+    instance.on("load", () => {
+      fit(instance);
+      setMap(instance);
+    });
+    instance.on("error", () => setMapError(true));
+    const observer = new ResizeObserver(() => instance.resize());
+    observer.observe(container.current);
+    return () => {
+      observer.disconnect();
+      setMap(null);
+      instance.remove();
+    };
+  }, []);
+  useEffect(() => {
+    if (!map) return;
+    (map.getSource("campaign") as GeoJSONSource).setData(campaignGeoJSON(game));
+    (map.getSource("orders") as GeoJSONSource).setData(armyRouteGeoJSON(game));
+  }, [map, game]);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  const visibleAt = Math.max(now, game.lastUpdatedAt);
   return (
-    <section className="world-map" aria-label="Six-city campaign map">
-      <svg
-        className="terrain"
-        viewBox="0 0 600 800"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <defs>
-          <pattern
-            id="grid"
-            width="60"
-            height="60"
-            patternUnits="userSpaceOnUse"
-          >
-            <path
-              d="M60 0H0V60"
-              fill="none"
-              stroke="#adc5a1"
-              strokeWidth=".5"
-              opacity=".1"
-            />
-          </pattern>
-          <radialGradient id="land">
-            <stop stopColor="#3c5144" />
-            <stop offset="1" stopColor="#223c36" />
-          </radialGradient>
-        </defs>
-        <rect width="600" height="800" fill="#162f32" />
-        <path
-          d="M-30 40 110 0 370 30 650-20 670 680 530 730 470 680 420 730 370 690 310 750 220 710 160 800 110 700 40 680 70 590 0 520Z"
-          fill="url(#land)"
-          stroke="#718675"
-          strokeOpacity=".3"
-        />
-        <g fill="none" stroke="#80927a" opacity=".12" strokeWidth="1.2">
-          <path d="M-20 230Q100 90 250 180T630 140M-20 250Q100 110 250 200T630 160M-20 270Q100 130 250 220T630 180M-20 290Q100 150 250 240T630 200" />
-          <path d="M170 700Q220 530 370 570T650 470M150 680Q200 510 370 550T650 450M130 660Q180 490 370 530T650 430" />
-          <path d="M320 90 350 35 385 100 415 60 455 125 480 80 530 145" />
-        </g>
-        <path
-          d="M290-30Q200 140 295 285T260 520Q220 640 160 800"
-          fill="none"
-          stroke="#538486"
-          strokeWidth="6"
-          opacity=".45"
-        />
-        <rect width="600" height="800" fill="url(#grid)" />
-      </svg>
+    <section className="world-map" aria-label="World map">
+      <div
+        className="map-canvas"
+        ref={container}
+        data-testid="geographic-map"
+        data-ready={!!map}
+      />
       <div className="map-heading">
         <span className="eyebrow">THE MERIDIAN FRONTIER</span>
         <h1>A foothold in the world.</h1>
         <p>Six cities. One beginning.</p>
       </div>
-      <div className="map-north" aria-hidden="true">
-        N<span>↑</span>
-      </div>
-      <svg
-        className="route-layer"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        {game.routes.map((route) => {
-          const a = project(game.cities.find((city) => city.id === route.a)!);
-          const b = project(game.cities.find((city) => city.id === route.b)!);
-          return (
-            <line
-              key={route.id}
-              x1={a.x}
-              y1={a.y}
-              x2={b.x}
-              y2={b.y}
-              vectorEffect="non-scaling-stroke"
-            />
-          );
-        })}
-      </svg>
-      <span className="region-label west" aria-hidden="true">
-        MERIDIAN UNION
-      </span>
-      <span className="region-label east" aria-hidden="true">
-        EASTERN ACCORD
-      </span>
-      {game.cities.map((city) => {
-        const point = project(city);
-        const faction = game.factions.find(
-          (faction) => faction.id === city.ownerId,
-        )!;
-        const count = game.armies
-          .filter((army) => army.cityId === city.id)
-          .reduce(
-            (sum, army) =>
-              sum + army.units.reduce((total, unit) => total + unit.count, 0),
-            0,
-          );
-        return (
-          <button
-            className={`city-marker ${city.ownerId === game.playerFactionId ? "friendly" : ""}`}
-            key={city.id}
-            style={
-              {
-                left: `${point.x}%`,
-                top: `${point.y}%`,
-                "--faction": faction.color,
-              } as CSSProperties
-            }
-            onClick={() => selectCity(city.id)}
-            aria-label={`${city.name}, ${faction.name}, morale ${Math.round(city.morale)}${city.queues.length ? ", active queue" : ""}`}
-          >
-            <span className="city-symbol">
-              {city.id === faction.capitalId ? "◆" : "▣"}
-            </span>
-            <strong>{city.name}</strong>
-            <span className="city-marker-meta">
-              {Math.round(city.morale)}% morale
-              {count > 0 && ` · ${count} units`}
-              {city.queues.length > 0 && " · ◷"}
-            </span>
+      {map && (
+        <>
+          <button className="map-fit secondary" onClick={() => fit(map)}>
+            Fit campaign
           </button>
-        );
-      })}
-      {game.armies
-        .filter((army) => army.order.kind === "move")
-        .map((army) => {
-          if (army.order.kind !== "move") return null;
-          const order = army.order;
-          const from = project(
-            game.cities.find((city) => city.id === order.fromId)!,
-          );
-          const to = project(
-            game.cities.find((city) => city.id === order.toId)!,
-          );
-          const progress = Math.min(
-            1,
-            (game.lastUpdatedAt - army.order.departedAt) /
-              (army.order.arrivesAt - army.order.departedAt),
-          );
-          return (
-            <span
-              key={army.id}
-              className="moving-army"
-              title={`${army.name} marching`}
-              style={{
-                left: `${from.x + (to.x - from.x) * progress}%`,
-                top: `${from.y + (to.y - from.y) * progress}%`,
-              }}
+          {[
+            { name: "FRANCE", lon: 2.1, lat: 48.7 },
+            { name: "BELGIUM", lon: 4.6, lat: 51.05 },
+            { name: "GERMANY", lon: 8.2, lat: 50.4 },
+            { name: "SWITZERLAND", lon: 7.4, lat: 46.9 },
+          ].map((label) => (
+            <MapMarker key={label.name} map={map} {...label}>
+              <span className="country-label">{label.name}</span>
+            </MapMarker>
+          ))}
+          {game.cities.map((city) => {
+            const faction = game.factions.find((f) => f.id === city.ownerId)!;
+            const attack = cityUnderAttack(game, city.id);
+            const shortage = !supplied.has(city.id) || city.shortageMinutes > 0;
+            const morale =
+              city.morale < BALANCE.rebellion.threshold
+                ? "critical"
+                : city.morale < 50
+                  ? "unsettled"
+                  : "steady";
+            return (
+              <MapMarker key={city.id} map={map} lon={city.lon} lat={city.lat}>
+                <button
+                  className={`city-marker ${morale}`}
+                  style={{ "--faction": faction.color } as CSSProperties}
+                  onClick={() => selectCity(city.id)}
+                  aria-label={`${city.name}, ${faction.name}, ${city.class}, morale ${Math.round(city.morale)}${attack ? ", under attack" : ""}${shortage ? ", supply problem" : ""}`}
+                >
+                  <span className="city-symbol">
+                    {city.class === "town"
+                      ? "▣"
+                      : city.class === "regional"
+                        ? "◆"
+                        : "♜"}
+                  </span>
+                  <strong>{city.name}</strong>
+                  <span className="city-marker-meta">
+                    {city.class} · {Math.round(city.morale)}% {morale}
+                  </span>
+                  {(attack || shortage) && (
+                    <span className="map-warning">
+                      {attack ? "⚔ Under attack " : ""}
+                      {shortage ? "! Supply" : ""}
+                    </span>
+                  )}
+                </button>
+              </MapMarker>
+            );
+          })}
+          {game.armies.map((army) => {
+            const point = armyVisualPosition(game, army, visibleAt);
+            const faction = game.factions.find((f) => f.id === army.ownerId)!;
+            const order = army.order;
+            const composition = army.units
+              .map((stack) => `${stack.count}${stack.type[0].toUpperCase()}`)
+              .join(" ");
+            const index = game.armies
+              .filter((a) => a.cityId === army.cityId)
+              .findIndex((a) => a.id === army.id);
+            return (
+              <MapMarker
+                key={army.id}
+                map={map}
+                {...point}
+                offsetX={44}
+                offset={-48 - (order.kind === "move" ? 0 : index * 48)}
+              >
+                <button
+                  className="army-marker"
+                  style={{ "--faction": faction.color } as CSSProperties}
+                  onClick={() => selectArmy(army.id)}
+                  aria-label={`${army.name}, ${faction.name}, ${unitCount(army)} units, ${order.kind}`}
+                >
+                  <strong>
+                    {order.kind === "move"
+                      ? "➤"
+                      : order.kind === "bombard"
+                        ? "✹"
+                        : "⚑"}{" "}
+                    {unitCount(army)} · {composition}
+                  </strong>
+                  {order.kind === "move" ? (
+                    <small>
+                      →{" "}
+                      {game.cities.find((city) => city.id === order.toId)?.name}{" "}
+                      · {duration(order.arrivesAt - visibleAt)}
+                    </small>
+                  ) : (
+                    <small>
+                      {order.kind === "bombard" ? "Bombarding" : "Stationed"}
+                      {!armyIsSupplied(game, army) ? " · ! Supply" : ""}
+                    </small>
+                  )}
+                </button>
+              </MapMarker>
+            );
+          })}
+        </>
+      )}
+      {mapError && (
+        <p className="map-error">
+          Map unavailable. Use Forces or Economy to inspect cities and issue
+          orders.
+        </p>
+      )}
+      <details className="map-events">
+        <summary>
+          Campaign events{" "}
+          {game.events.length > 0
+            ? `· ${game.events.length}`
+            : "· no orders yet"}
+          <small>{game.events.at(-1)?.message}</small>
+        </summary>
+        <div>
+          {[...game.events].reverse().map((event) => (
+            <button
+              key={event.id}
+              onClick={() => event.cityId && selectCity(event.cityId)}
             >
-              ➤
-            </span>
-          );
-        })}
-      <div className="map-footer">
-        <div className="legend">
-          <span>
-            <i /> You
-          </span>
-          <span>
-            <i className="enemy" /> Eastern Accord
-          </span>
+              <time>{time(event.at)}</time> {event.message}
+            </button>
+          ))}
         </div>
-        <p>Tap a city to inspect and give orders</p>
-        <small>Schematic map · route distances are campaign values</small>
+      </details>
+      <div className="map-legend">
+        ◆ Regional · ▣ Town · I Infantry · C Cavalry · A Artillery
+        <br />
+        Green: Meridian · Amber: Eastern · Pink: Rebels
       </div>
     </section>
   );

@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["icons/*.png", "icons/*.svg"],
+      includeAssets: ["icons/*.png", "icons/*.svg", "maps/*.geojson"],
       manifest: {
         name: "Atlas Dominion",
         short_name: "Atlas",
@@ -29,7 +29,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,png,svg,woff2}"],
+        globPatterns: ["**/*.{js,css,html,png,svg,woff2,geojson}"],
         navigateFallback: "index.html",
       },
     }),

@@ -1,4 +1,4 @@
-import initialBalance from "../../data/balance.json";
+import initialBalance from "../../data/balance.json" with { type: "json" };
 import type { BuildingType, ResourceBundle, UnitType } from "../types/game";
 
 export const MINUTE = 60_000;
@@ -20,6 +20,46 @@ export const bundle = (
 ): ResourceBundle => ({ money, food, iron, oil });
 
 export const BALANCE = {
+  combat: {
+    intervalMs: 5 * MINUTE,
+    variance: 0.1,
+    minimumMoraleFactor: 0.25,
+    casualtyMoraleLoss: 3,
+    cityDefence: 0.3,
+    fortificationDefence: 0.2,
+    unsuppliedFactor: 0.55,
+  },
+  capture: {
+    durationMs: 15 * MINUTE,
+    minimumIntegrityFactor: 0.35,
+    fortificationDelay: 0.5,
+    stability: 25,
+    morale: 35,
+  },
+  rebellion: {
+    threshold: 20,
+    durationMs: 45 * MINUTE,
+    infantryPerMillion: 4,
+    minimumInfantry: 2,
+    morale: 35,
+    stability: 25,
+    color: "#da89be",
+  },
+  artillery: {
+    rangeKm: 150,
+    cooldownMs: 5 * MINUTE,
+    cityDamage: 30,
+    armyDamage: 22,
+    fortificationProtection: 0.25,
+    moraleDamage: 0.5,
+    stabilityDamage: 0.5,
+  },
+  cityClasses: {
+    town: { maxPopulation: 1, integrity: 400 },
+    regional: { maxPopulation: 3, integrity: 650 },
+    major: { maxPopulation: 8, integrity: 900 },
+    metropolis: { maxPopulation: Infinity, integrity: 1200 },
+  },
   tickMs: initialBalance.campaign.simulationTickSeconds * 1000,
   campaignHours: initialBalance.campaign.durationHours,
   foodPerPopulationHour: 10,
@@ -49,6 +89,9 @@ export const BALANCE = {
 
 interface UnitDefinition {
   label: string;
+  attack: number;
+  defence: number;
+  hp: number;
   cost: ResourceBundle;
   recruitMs: number;
   speedKph: number;
@@ -62,6 +105,9 @@ const artillery = initialBalance.units.artillery;
 export const UNITS: Record<UnitType, UnitDefinition> = {
   infantry: {
     label: "Infantry",
+    attack: 160,
+    defence: 1,
+    hp: 100,
     cost: bundle(infantry.money, infantry.food),
     recruitMs: infantry.recruitMinutes * MINUTE,
     speedKph: infantry.speedKph,
@@ -71,6 +117,9 @@ export const UNITS: Record<UnitType, UnitDefinition> = {
   },
   cavalry: {
     label: "Cavalry",
+    attack: 230,
+    defence: 1.15,
+    hp: 120,
     cost: bundle(cavalry.money, cavalry.food),
     recruitMs: cavalry.recruitMinutes * MINUTE,
     speedKph: cavalry.speedKph,
@@ -80,6 +129,9 @@ export const UNITS: Record<UnitType, UnitDefinition> = {
   },
   artillery: {
     label: "Artillery",
+    attack: 45,
+    defence: 0.65,
+    hp: 45,
     cost: bundle(artillery.money, 0, artillery.iron),
     recruitMs: artillery.recruitMinutes * MINUTE,
     speedKph: artillery.speedKph,
@@ -124,7 +176,7 @@ export const BUILDINGS: Record<BuildingType, BuildingDefinition> = {
     durationMs: HOUR,
     maxLevel: 2,
     description:
-      "+2 target morale per level. Combat defence comes in the military milestone.",
+      "+2 target morale per level. Improves city defence and slows capture.",
   },
   university: {
     label: "University",

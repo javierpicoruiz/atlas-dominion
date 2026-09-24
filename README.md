@@ -1,30 +1,25 @@
 # Atlas Dominion
 
-A mobile-first, persistent real-time grand-strategy game. A normal campaign is designed to last roughly seven real days.
+A mobile-first, persistent real-time grand-strategy prototype. A normal campaign is designed to last roughly seven real days.
 
 > Conquering territory is easier than maintaining it.
 
-This foundation deliberately uses **six cities**, three resource sites, seven land routes, a player faction and one passive AI faction. The original documentation and full world seed are preserved; the full seed is not loaded by the app.
+The **second playable milestone** keeps the original **six cities**, three resource sites, seven land routes, and two starting factions. It adds a geographical MapLibre map, army orders, deterministic combat, artillery, occupation and rebellion. The 74-city world seed remains unused.
 
 ## Run locally
 
-Requires Node.js 22.12+ (Node 24 recommended) and npm.
+Requires Node.js 22.12+ and npm.
 
 ```bash
 npm ci
 npm run dev
+npm test                 # Simulation, persistence, migration and store tests
+npm run test:watch
+npm run build            # TypeScript + production bundle + PWA
+npm run preview
 ```
 
-Open the URL printed by Vite. The dev server binds to all interfaces for phone testing on a local network. PWA installation and service workers require HTTPS or localhost; use a production HTTPS deployment to test installation on a phone.
-
-```bash
-npm test                 # Vitest simulation, persistence and store tests
-npm run test:watch       # Watch unit tests
-npm run build            # Strict TypeScript check + production bundle + PWA
-npm run preview          # Serve dist locally
-```
-
-Optional Chromium browser checks (run against a fresh production build):
+The dev server binds to all interfaces for phone testing. PWA installation requires HTTPS or localhost. Browser checks run against a fresh production build:
 
 ```bash
 npx playwright install chromium
@@ -32,75 +27,78 @@ npm run build
 npm run test:e2e
 ```
 
-On a fresh Linux host, Playwright may require its system dependencies (`npx playwright install --with-deps chromium`). Browser tests cover orders, reloads, narrow phone layouts and service-worker-controlled offline reloads. They emulate phone dimensions in Chromium; they do not certify iOS Safari.
+On a fresh Linux host, Playwright may need `npx playwright install --with-deps chromium`. For a restricted home directory, use `PLAYWRIGHT_BROWSERS_PATH=/tmp/atlas-playwright` for both installation and tests. Chromium uses software WebGL for headless map testing. The suite emulates iPhone dimensions; it does not certify physical iOS Safari.
 
-## Play the foundation
+## Play the campaign
 
-- Tap **Haven**, **Ashford** or **Greenfield** on the map to open its city sheet.
-- Use **Army** to recruit infantry (15 minutes). Upgrade Barracks to level 2 to recruit cavalry (30 minutes), or construct an Arsenal for artillery (45 minutes).
-- Use **Buildings** to queue construction. Costs are paid immediately. Construction and recruitment have independent serial queues with four slots each. Prerequisites must be complete before a recruitment order is accepted.
-- Open **Forces** to send an army to a directly connected friendly city. Mixed armies travel at the slowest unit’s speed, modified by route terrain. Departure and arrival times are absolute timestamps.
-- Tap a resource or open **Economy** to see production, consumption, net hourly rates and reserve duration when running a deficit.
-- Close the page and return later. Queues, arrivals, resources, morale and stability catch up from the saved timestamp. An event log in Forces records recent orders and completions.
+- Pan or pinch the **World** map. **Fit campaign** restores the initial six-city view. Faction colours identify ownership; city symbols distinguish class. Morale, attack and supply warnings appear on city markers.
+- Tap a city for population, integrity, morale, stability, resources, buildings, armies and queues. Use **Army** to recruit infantry; upgrade Barracks for cavalry or build an Arsenal for artillery. Construction and recruitment have independent serial queues.
+- Tap a friendly army, choose a connected city, review travel time, then **Confirm order**. Enemy cities are legal destinations. **Forces** provides the same controls. Mixed forces move at their slowest unit's speed.
+- Opposing armies at a city fight automatically in five-minute rounds. Defending garrisons receive city and fortification bonuses. Morale and supply affect combat strength.
+- Once field defenders are gone, infantry or cavalry begin capture. Base occupation takes 15 minutes; damaged cities fall faster and fortifications delay capture. Departing or renewed fighting cancels the countdown.
+- Supplied artillery can **Bombard** a connected enemy city or stationed army, firing every five minutes. City attacks reduce integrity, morale and stability. Moving or direct combat interrupts bombardment. Lost supply pauses fire. Artillery cannot capture territory.
+- Captured cities retain buildings, damage and local reserves, start with 25 stability and at most 35 morale, and enter occupation. Unfinished paid construction/recruitment is cancelled on a change of government; resource sites change owner with their city.
+- Morale below 20 starts a 45-minute unrest timer. Recovery to 20 or above cancels it. Continuous critical unrest causes independence and population-scaled rebel infantry. Existing hostile garrisons then fight the rebels normally.
+- **Campaign events** on the map shows the latest message and expands into a bounded history. Arrivals, battle starts/ends, bombardment, capture and rebellion are recorded without repeated salvo alerts. **Forces** also shows recent events.
+- Leave and return later: the saved timestamps reconstruct economy, recruitment, movement, battles, capture and rebellion. Animation never decides an arrival or outcome.
 
-Each command is saved to IndexedDB before the UI reports success. Saves are local to this browser and origin. The interface refreshes and saves while visible and catches up on reload, focus and resume. Storage errors are shown, not silently ignored. A stale tab cannot overwrite a newer save from another tab; reload it to continue.
+The miniature campaign retains its original fictional city names, latitude/longitude and deliberately compressed **campaign route distances**. Movement and connected artillery range use those existing route kilometres (150 km maximum for artillery), rather than changing the established travel balance to match the background geography.
 
-To deliberately start over during development, remove the `atlas-dominion` IndexedDB database in browser developer tools and reload. This deletes that local campaign. There is no in-game reset or save import/export in this milestone.
+Each command is persisted to IndexedDB before the UI reports success. Saves belong to this browser and origin. Stale tabs cannot overwrite newer saves. To deliberately restart during development, delete the `atlas-dominion` IndexedDB database and reload; there is no in-game reset or import/export yet.
 
-## Simulation and architecture
+## Architecture decisions
 
 ```text
 src/
-  app/             Application shell, formatting and mobile styles
-  components/      City bottom sheet and army controls
-  screens/         Forces, Economy, Tech and Diplomacy panels
-  map/             Schematic renderer and MapLibre-ready GeoJSON adapter
-  types/           Strongly typed game entities and command unions
-  data/            Six-city campaign and central balance configuration
-  simulation/      Pure TypeScript clock, RNG, economy, morale, logistics,
-                   queues, movement, commands and elapsed-time advancement
-  state/           Zustand orchestration, separate UI state, Dexie and save validation
-public/icons/      Vector source and installable PWA icons
-tests/             Determinism, offline simulation, command validation, saves
-  browser/         Production browser/PWA smoke tests
+  app/             Shell, formatting and mobile styles
+  components/      City and army bottom sheets, order confirmation
+  screens/         Forces, Economy, Tech and Diplomacy
+  map/             MapLibre renderer, GeoJSON adapters, visual interpolation
+  types/           Typed entities, commands, orders and events
+  data/            Six-city fixture and central balance configuration
+  simulation/      Pure TypeScript economy, logistics, morale, movement,
+                   combat, capture, rebellion, queues and timestamp scheduler
+  state/           Separate Zustand UI/game state, Dexie, validation and migration
+public/maps/       Bundled Natural Earth regional geography and provenance
+public/icons/      PWA icons
+tests/             Simulation, save compatibility and store tests
+  browser/         Production map, gestures, military UI and offline PWA checks
 ```
-
-The pure entry point is:
 
 ```ts
 const next = advanceGameState(state, state.lastUpdatedAt, currentTimestamp);
 ```
 
-- All times are integer Unix milliseconds. Commands apply at `state.lastUpdatedAt`; callers first advance the state to the command time.
-- Economy and morale use 60-second ticks anchored to the campaign start. Partial minutes remain pending across refreshes and saves. Queues and movements resolve at exact timestamps, between ticks where necessary.
-- Coincident events resolve in a fixed order: economy/morale, arrivals, then queue completions. A newly completed unit or building participates in the following economy tick. Refreshing frequently and returning after a long absence produce identical state for identical timestamped commands.
-- Transitions clone their inputs. Simulation modules do not import React, Zustand, Dexie or browser APIs. They never read wall-clock time or use global randomness.
-- The clock and seeded RNG are injectable. The seed and RNG state are saved. Seeded starting morale varies slightly; there are no random combat/events in this milestone.
-- Each food pool allocates food proportionally, avoiding city iteration order bias. City demand, army food and wages, taxes, resource sites, shortage stages, morale convergence and stability recovery share centralized balance settings in `src/data/balance.ts`. Existing unit prices, recruitment times and speeds are read from `data/balance.json`.
-- The foundation supply graph connects friendly cities to owned capitals or depots. Connected cities use faction stockpiles; isolated cities use local reserves. This is a minimal connectivity model, not full supply capacity or army attrition.
-- Dexie database version **1** stores a schema-versioned game snapshot plus a transactional revision. Runtime validation checks shape, resource bounds, entity references and timestamps. Unsupported future versions and invalid saves are preserved and reported. No older application save format exists yet; future schema changes must add explicit migration before changing the version.
-- The 15-second foreground refresh is only a UI convenience. No background timer is necessary for progress while closed.
+- Simulation imports no React, MapLibre, Zustand, Dexie or browser APIs. Transitions clone their inputs. All costs, statistics, timings and gameplay thresholds live in `src/data/balance.ts`, with existing unit values sourced from `data/balance.json`.
+- Economy/morale retain campaign-anchored one-minute ticks. Arrivals, queues, battle rounds, artillery cooldowns, capture and rebellion are scheduled at absolute timestamps. Coincident events resolve economy/morale, arrivals, queues, direct combat, bombardment, capture, then rebellion, reconciling military and unrest state between phases.
+- Direct combat computes attacks from a snapshot and applies casualties simultaneously. Attack/defence, count, morale, supply and city defences contribute. Small seeded variation uses an injectable RNG factory; its updated state is saved. Persistent partial damage allows small armies to inflict losses over multiple rounds. Infantry screens cavalry and artillery.
+- Technology has no existing levels in the foundation, so no technology multiplier or research tree is invented here. Universities remain preparatory infrastructure.
+- Supply remains a graph of owned cities linked to capitals or depots. Frontier armies may draw rations from an adjacent supplied friendly city while attacking. Ownership and resource-site transfers immediately change the derived supply graph. Unsupplied armies fight at reduced strength; advanced capacity, attrition and timed supply penalties remain future work.
+- **Save payload schema 2** explicitly migrates foundation schema 1: cities gain full class-based integrity and empty occupation/unrest state, armies gain morale and partial-damage state, and battle/event fields are initialised. Existing timestamps, queues, movement orders, resources and RNG state are retained. The Dexie database layout stays at version 1; transactional revisions still guard concurrent saves. Invalid and unknown-version saves are preserved and reported.
+- MapLibre owns projection, gestures and camera state. Pure `armyVisualPosition` interpolates saved departure/arrival timestamps and clamps to endpoints. A presentation refresh updates markers; the simulation remains authoritative. The normal 15-second app refresh is only a foreground convenience.
 
-## PWA and deployment
+## PWA and geography
 
-The production build generates a manifest and service worker and precaches the shell, scripts, styles and icons. Visit once online to populate the cache; subsequent play works offline. The map is a local schematic with no tile-server dependency. PWA setup follows the [Vite PWA documentation](https://vite-pwa-org.netlify.app/guide/); IndexedDB persistence uses [Dexie](https://dexie.org/docs/Typescript).
+MapLibre renders bundled country polygons, campaign routes, cities and armies. This deliberately uses a small geographical background without external tile servers or API keys. Natural Earth is [public-domain geographic data](https://www.naturalearthdata.com/about/terms-of-use/); see `public/maps/README.md` for provenance.
 
-`vite.config.ts` uses a relative base and relative manifest scope/start URL. The contents of `dist/` can be deployed beneath a GitHub Pages repository path or another static HTTPS host. Publish the **build output**, not source files; do not commit `dist/`. No deployment or remote publishing is performed by the build.
+The MapLibre worker is bundled explicitly using Vite's `?worker&url` integration, following the [MapLibre installation guide](https://maplibre.org/maplibre-gl-js/docs/). The production service worker precaches that worker, geography, scripts, styles and icons. Visit once online; subsequent map rendering and play work offline. The map increases the precache to roughly 2.3 MiB and produces Vite's advisory large-chunk warning.
 
-## Scope and next milestone
+`vite.config.ts` uses a relative base, manifest scope and start URL. Deploy `dist/` under a static HTTPS host or GitHub Pages repository path. Build output and `node_modules` are ignored by Git; no deployment is performed by the build.
 
-Working now: the responsive shell, selectable map, resource economy, morale/stability, construction, all three unit types, timestamp-based friendly movement, basic supply connectivity, deterministic offline advancement, durable save/load and offline PWA shell.
+## Validation and remaining scope
 
-The map remains a placeholder for MapLibre integration. The AI faction participates in the economy but does not issue orders. Universities are buildable infrastructure with no research output yet; fortifications currently improve target morale. Combat, capture, rebellion, advanced supply penalties, research, diplomacy, victory resolution and final artwork are not implemented. The seven-day indicator is pacing information, not an enforced campaign end. There is no aircraft, naval warfare, monetisation, backend or multiplayer.
+Validated: **47 Vitest tests pass**, **7 Playwright browser tests pass**, and the production build passes. Offline geographic-map reload is included in the browser suite.
 
-**Recommended next milestone:** replace the schematic renderer with MapLibre using the existing geographic graph and GeoJSON adapter, retaining the same six-city fixture. Then implement and test combat, capture, occupation and rebellion before expanding the world or adding active AI.
+The tests cover deterministic economy and combat, simultaneous damage, stronger forces, morale/supply/fortification effects, artillery vulnerability and targeting, interrupted capture, low-stability occupation, exact rebellion deadlines and cancellation, schema migration, and identical results across offline jumps and serialised refreshes. Browser checks cover recruitment/construction, movement confirmation and reload, touch pan/pinch, narrow layouts, offline map reload, battle/capture, bombardment and rebellion feedback.
+
+AI garrisons defend automatically and their cities participate in the economy; strategic AI orders are not added in this milestone. Research, treaties, advanced supply, natural integrity repair, victory enforcement, aircraft, ships and world expansion remain out of scope. The seven-day indicator is pacing information, not an enforced campaign end.
+
+Next: tune the six-city combat/economy/occupation loop and add limited strategic AI before expanding the campaign.
 
 ## Project references
 
-- `AGENTS.md` — project engineering instructions.
-- `TASK.md` — this foundation's deliverables and completion checks.
+- `AGENTS.md` — engineering instructions.
+- `TASK.md` — retained first-foundation brief; this milestone implements the subsequent user request.
 - `docs/GAME_DESIGN.md` — gameplay source of truth.
 - `docs/CODEX_BUILD_PROMPT.md` — implementation roadmap.
-- `data/balance.json` — preserved initial balance constants.
-- `data/schema.json` — preserved suggested model.
-- `data/world_seed.json` — preserved 74-city seed for later milestones.
+- `data/world_seed.json` — preserved full world seed, not loaded by the app.

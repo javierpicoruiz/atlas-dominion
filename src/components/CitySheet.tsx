@@ -14,6 +14,7 @@ import { cityRates } from "../simulation/economy";
 import { cityStockpile, suppliedCityIds } from "../simulation/logistics";
 import { commandProblem } from "../simulation/commands";
 import type { GameState } from "../types/game";
+import { cityUnderAttack } from "../simulation/combat";
 import { ArmyCard } from "./ArmyCard";
 
 export function CitySheet({ game }: { game: GameState }) {
@@ -74,13 +75,49 @@ export function CitySheet({ game }: { game: GameState }) {
         )}
         {!owned && (
           <p className="notice">
-            Eastern Accord territory. Military operations arrive in the next
-            milestone.
+            Foreign territory. Defeat field forces and occupy with infantry or
+            cavalry to capture.
           </p>
         )}
         {cityTab === "Overview" && (
           <>
+            <p className="muted capitalize">
+              {city.class} city{" "}
+              {cityUnderAttack(game, city.id) && (
+                <strong className="warning"> · Under attack</strong>
+              )}
+            </p>
+            {city.capture && (
+              <p className="notice warning">
+                Occupation in progress · completes{" "}
+                {dateTime(city.capture.completesAt)}
+              </p>
+            )}
+            {city.occupiedAt !== null && (
+              <p className="notice">
+                Occupied since {dateTime(city.occupiedAt)}. Secure supply and
+                rebuild stability.
+              </p>
+            )}
+            {city.criticalSince !== null && (
+              <p className="notice warning">
+                Rebellion imminent ·{" "}
+                {duration(
+                  city.criticalSince +
+                    BALANCE.rebellion.durationMs -
+                    game.lastUpdatedAt,
+                )}{" "}
+                to restore morale to {BALANCE.rebellion.threshold}.
+              </p>
+            )}
             <div className="stat-grid">
+              <div>
+                <span>Integrity / HP</span>
+                <strong>
+                  {Math.round(city.integrity)}
+                  <small> / {city.maxIntegrity}</small>
+                </strong>
+              </div>
               <div>
                 <span>Morale</span>
                 <strong className={city.morale < 40 ? "warning" : ""}>
@@ -142,6 +179,16 @@ export function CitySheet({ game }: { game: GameState }) {
                 ).join(" · ")}
               </p>
             )}
+            <h3>Stationed armies</h3>
+            <p>
+              {game.armies
+                .filter((army) => army.cityId === city.id)
+                .map(
+                  (army) =>
+                    `${army.name} (${army.units.reduce((sum, unit) => sum + unit.count, 0)})`,
+                )
+                .join(" · ") || "No army stationed here."}
+            </p>
             <h3>Infrastructure</h3>
             <p>
               {city.buildings
@@ -253,7 +300,7 @@ export function CitySheet({ game }: { game: GameState }) {
             {game.armies
               .filter((army) => army.cityId === city.id)
               .map((army) =>
-                owned ? (
+                army.ownerId === game.playerFactionId ? (
                   <ArmyCard key={army.id} army={army} game={game} />
                 ) : (
                   <p key={army.id}>
@@ -268,7 +315,7 @@ export function CitySheet({ game }: { game: GameState }) {
             )}
           </>
         )}
-        {owned && (
+        {
           <section className="queue-section" aria-label="City queues">
             <h3>
               Orders{" "}
@@ -307,7 +354,7 @@ export function CitySheet({ game }: { game: GameState }) {
               ).join(" · ")}
             </p>
           </section>
-        )}
+        }
       </div>
     </dialog>
   );

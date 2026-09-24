@@ -1,4 +1,4 @@
-import { BUILDINGS, UNITS } from "../data/balance";
+import { BALANCE, BUILDINGS, UNITS } from "../data/balance";
 import type { GameState } from "../types/game";
 import { nextId, recordEvent } from "./events";
 export function resolveQueues(state: GameState, timestamp: number): void {
@@ -31,6 +31,8 @@ export function resolveQueues(state: GameState, timestamp: number): void {
             cityId: city.id,
             ownerId: city.ownerId,
             units: [],
+            morale: BALANCE.initialMorale,
+            damage: 0,
             order: { kind: "hold" },
           };
           state.armies.push(army);

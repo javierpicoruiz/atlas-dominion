@@ -64,7 +64,7 @@ it("rejects future versions and corrupt saves without overwriting them", async (
   await expect(db.load()).rejects.toThrow("Unsupported save schema");
   expect((await db.campaigns.get("latest"))?.state.schemaVersion).toBe(99);
   await db.campaigns.update("latest", {
-    "state.schemaVersion": 1,
+    "state.schemaVersion": 2,
     "state.cities": [],
   });
   await expect(db.load()).rejects.toThrow("invalid");

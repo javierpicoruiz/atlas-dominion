@@ -2,6 +2,7 @@ import { BALANCE, BUILDINGS, RESOURCES, UNITS } from "../data/balance";
 import type { GameCommand, GameState, ResourceBundle } from "../types/game";
 import { cityStockpile } from "./logistics";
 import { nextId, recordEvent } from "./events";
+import { bombardProblem, syncMilitary } from "./combat";
 import { travelDuration } from "./movement";
 
 function spend(stock: ResourceBundle, cost: ResourceBundle): void {
@@ -20,17 +21,49 @@ export function applyCommand(
   const at = next.lastUpdatedAt;
   if (!next.factions.some((faction) => faction.id === actorId))
     throw new Error("Unknown faction.");
+  if (command.kind === "bombard" || command.kind === "hold") {
+    const army = next.armies.find((entry) => entry.id === command.armyId);
+    if (!army || army.ownerId !== actorId)
+      throw new Error("You do not control this army.");
+    if (army.order.kind === "move") throw new Error("Army is already moving.");
+    if (command.kind === "hold") army.order = { kind: "hold" };
+    else {
+      const problem = bombardProblem(
+        next,
+        army,
+        command.targetCityId,
+        command.targetArmyId ?? null,
+      );
+      if (problem) throw new Error(problem);
+      if (army.order.kind === "bombard")
+        throw new Error("Stop the current bombardment first.");
+      army.order = {
+        kind: "bombard",
+        targetCityId: command.targetCityId,
+        targetArmyId: command.targetArmyId ?? null,
+        nextFireAt: at + BALANCE.artillery.cooldownMs,
+      };
+      const city = next.cities.find(
+        (entry) => entry.id === command.targetCityId,
+      )!;
+      recordEvent(
+        next,
+        at,
+        `${city.name} under bombardment from ${army.name}.`,
+        "bombardment",
+        city.id,
+      );
+    }
+    return next;
+  }
   if (command.kind === "move") {
     const army = next.armies.find((army) => army.id === command.armyId);
     if (!army || army.ownerId !== actorId)
       throw new Error("You do not control this army.");
-    if (army.order.kind !== "hold" || !army.cityId)
+    if (army.order.kind === "move" || !army.cityId)
       throw new Error("Army is already moving.");
     const destination = next.cities.find((city) => city.id === command.toId);
-    if (!destination || destination.ownerId !== actorId)
-      throw new Error(
-        "Only friendly cities are available until the combat milestone.",
-      );
+    if (!destination) throw new Error("Unknown destination.");
     const route = next.routes.find(
       (route) =>
         (route.a === army.cityId && route.b === destination.id) ||
@@ -47,6 +80,7 @@ export function applyCommand(
       arrivesAt: at + travelDuration(army, route),
     };
     army.cityId = null;
+    syncMilitary(next, at);
     recordEvent(next, at, `${army.name} departed for ${destination.name}.`);
     return next;
   }

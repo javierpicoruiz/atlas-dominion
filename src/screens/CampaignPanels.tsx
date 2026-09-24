@@ -24,7 +24,8 @@ export function CampaignPanels({
       {tab === "Forces" && (
         <>
           <p className="intro">
-            Recruit in your cities. Redeploy along friendly land routes.
+            Recruit in your cities. March along connected routes. Occupy enemy
+            cities with direct forces.
           </p>
           <div className="card-list">
             {game.armies
@@ -34,8 +35,8 @@ export function CampaignPanels({
               ))}
           </div>
           <p className="notice">
-            The slowest unit sets an army’s speed. Combat and hostile movement
-            are planned for the military milestone.
+            The slowest unit sets an army’s speed. Artillery can bombard cities
+            and armies, but only infantry and cavalry capture territory.
           </p>
         </>
       )}
@@ -113,13 +114,13 @@ export function CampaignPanels({
       )}
       {tab === "Diplomacy" && (
         <>
-          <p className="intro">Two factions share the Meridian frontier.</p>
+          <p className="intro">Factions contest the Meridian frontier.</p>
           {game.factions.map((other) => (
             <article className="card" key={other.id}>
               <span className="eyebrow">
                 {other.controller === "player"
                   ? "Your faction"
-                  : "AI faction · passive foundation"}
+                  : "AI faction · defensive garrisons"}
               </span>
               <h2 style={{ color: other.color }}>{other.name}</h2>
               <p>
@@ -130,8 +131,9 @@ export function CampaignPanels({
             </article>
           ))}
           <p className="notice">
-            The Eastern Accord’s cities produce and consume resources. AI
-            decisions, war and treaties are future milestones.
+            The Eastern Accord’s cities produce and consume resources. Garrisons
+            defend automatically. Strategic AI decisions and treaties are future
+            milestones.
           </p>
         </>
       )}

@@ -20,6 +20,8 @@ export function resolveArrivals(state: GameState, timestamp: number): void {
       state,
       order.arrivesAt,
       `${army.name} arrived at ${state.cities.find((city) => city.id === order.toId)!.name}.`,
+      "arrival",
+      order.toId,
     );
   }
 }

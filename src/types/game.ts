@@ -32,7 +32,18 @@ export type QueueItem = {
   | { kind: "building"; building: BuildingType; level: number }
   | { kind: "recruitment"; unit: UnitType }
 );
+export type CityClass = "town" | "regional" | "major" | "metropolis";
 export interface City extends Location {
+  class: CityClass;
+  integrity: number;
+  maxIntegrity: number;
+  criticalSince: Timestamp | null;
+  occupiedAt: Timestamp | null;
+  capture: {
+    factionId: string;
+    startedAt: Timestamp;
+    completesAt: Timestamp;
+  } | null;
   id: string;
   name: string;
   ownerId: string;
@@ -65,6 +76,12 @@ export interface Route {
 export type ArmyOrder =
   | { kind: "hold" }
   | {
+      kind: "bombard";
+      targetCityId: string;
+      targetArmyId: string | null;
+      nextFireAt: Timestamp;
+    }
+  | {
       kind: "move";
       routeId: string;
       fromId: string;
@@ -73,6 +90,8 @@ export type ArmyOrder =
       arrivesAt: Timestamp;
     };
 export interface Army {
+  morale: number;
+  damage: number;
   id: string;
   name: string;
   ownerId: string;
@@ -84,9 +103,20 @@ export interface GameEvent {
   id: string;
   at: Timestamp;
   message: string;
+  kind:
+    | "order"
+    | "arrival"
+    | "battle-start"
+    | "battle-end"
+    | "capture"
+    | "bombardment"
+    | "unrest"
+    | "rebellion";
+  cityId: string | null;
 }
 export interface GameState {
-  schemaVersion: 1;
+  schemaVersion: 2;
+  battles: { cityId: string; startedAt: Timestamp; nextRoundAt: Timestamp }[];
   seed: number;
   rngState: number;
   nextId: number;
@@ -104,4 +134,11 @@ export interface GameState {
 export type GameCommand =
   | { kind: "build"; cityId: string; building: BuildingType }
   | { kind: "recruit"; cityId: string; unit: UnitType }
-  | { kind: "move"; armyId: string; toId: string };
+  | { kind: "move"; armyId: string; toId: string }
+  | {
+      kind: "bombard";
+      armyId: string;
+      targetCityId: string;
+      targetArmyId?: string;
+    }
+  | { kind: "hold"; armyId: string };
